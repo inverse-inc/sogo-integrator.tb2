@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!--
+ Copyright:     Inverse inc., 2008
+ Author:        Wolfgang Sourdeau <wsourdeau@inverse.ca>
+ Email:         support@inverse.ca
+ URL:           http://inverse.ca
+  -->
+
+<!DOCTYPE dialog SYSTEM "chrome://sogo-integrator/locale/calendar/roles-dialog.dtd">
+
+<?xml-stylesheet type="text/css" href="chrome://sogo-integrator/skin/roles-dialog.css"?>
+<?xml-stylesheet type="text/css" href="chrome://global/content/xul.css"?>
+<?xml-stylesheet type="text/css" href="chrome://global/skin/global.css"?>
+<?xml-stylesheet type="text/css" href="chrome://global/skin/popup.css"?>
+<?xml-stylesheet type="text/css" href="chrome://global/skin/textbox.css"?>
+<?xml-stylesheet type="text/css" href="chrome://global/skin/toolbar.css"?>
+<?xml-stylesheet type="text/css" href="chrome://messenger/content/messenger.css"?>
+
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  id="rolesDialog"
+  type="dialog"
+  buttons="none"
+  title="&roles-dialog.title;">
+  <script type="application/x-javascript"
+    src="chrome://sogo-integrator/content/calendar/roles-dialog.js"/>
+
+  <commandset id="rolesCommands">
+    <command id="RolesCommandUpdate" oncommand="updateCurrentUser();"/>
+    <command id="RolesCommandCancel" oncommand="window.close()"/>
+  </commandset>
+
+  <vbox>
+    <vbox id="titleContent">
+      <label collapsed="true" id="defaultTitle"
+	value="&roles-dialog.default-roles.label;"/>
+      <vbox collapsed="true" id="userTitle">
+	<label value="&roles-dialog.user-roles.label;"/>
+	<label id="titleUserName" value=""/>
+      </vbox>
+    </vbox>
+
+    <vbox id="dialogContent">
+      <hbox>
+	<spacer flex="1"/>
+	<vbox id="roleChoices">
+	  <hbox>
+	    <spacer flex="1"/>
+	    <label value="&roles-dialog.public.label;"/>
+	    <menulist id="menuPublic">
+	      <menupopup>
+		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
+		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
+		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+	      </menupopup>
+	    </menulist>
+	  </hbox>
+	  <hbox>
+	    <spacer flex="1"/>
+	    <label value="&roles-dialog.confidential.label;"/>
+	    <menulist id="menuConfidential">
+	      <menupopup>
+		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
+		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
+		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+	      </menupopup>
+	    </menulist>
+	  </hbox>
+	  <hbox>
+	    <spacer flex="1"/>
+	    <label value="&roles-dialog.private.label;"/>
+	    <menulist id="menuPrivate">
+	      <menupopup>
+		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
+		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
+		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+	      </menupopup>
+	    </menulist>
+	  </hbox>
+	</vbox>
+	<spacer flex="1"/>
+      </hbox>
+      <checkbox id="roleObjectCreator"
+	label="&roles-dialog.roles.object-creator.label;"
+	disabled="true"
+	checked="false"/>
+      <checkbox id="roleObjectEraser"
+	label="&roles-dialog.roles.object-eraser.label;"
+	disabled="true"
+	checked="false"/>
+      <hbox id="entriesToolbar">
+	<spacer flex="1"/>
+	<button disabled="true" id="updateBtn" command="RolesCommandUpdate"
+	  label="&roles-dialog.update-button.label;"/>
+	<button id="cancelBtn" command="RolesCommandCancel"
+	  label="&roles-dialog.cancel-button.label;"/>
+      </hbox>
+    </vbox>
+  </vbox>
+</dialog>

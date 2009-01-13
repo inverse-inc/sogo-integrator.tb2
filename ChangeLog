@@ -1,0 +1,25 @@
+2009-01-13  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+        * We now offer a Delete Calendar / Unsubscribe From Calendar
+	option from the contextual menu to avoid confusion for users
+
+2008-12-08  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+        * chrome/content/sogo-integrator/calendar/calendar-event-dialog.js
+	We strip the whitespaces when considering the length of the title
+
+2008-12-08  Ludovic Marcotte  <lmarcotte@inverse.ca>
+	
+	* chrome/content/sogo-integrator/calendar/calendar-event-dialog.js
+	We now warn the user about components w/o a title
+	* We now offer an option to reload ACLs on calendar that we
+	are not the owner and we also load the ACLs immediatly
+	after adding a CalDAV calendar (using the subscribe feature)
+
+2008-12-03  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+        * Added a new overlay in order to control the
+	visibility of the "Send attendees inviation by email"
+	checkbox from Lightning. You can now show/hide by setting
+	the following preference:
+	sogo-integrator.disable-send-invitations-checkbox

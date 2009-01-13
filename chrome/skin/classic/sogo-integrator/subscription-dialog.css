@@ -1,0 +1,18 @@
+#inverseSubscriptionDialog
+{ width: 400px;
+  height: 200px; }
+
+tree
+{ background-color: -moz-dialog !important; }
+
+tree[searching="done"]
+{ background-color: -moz-field !important; }
+
+treechildren::-moz-tree-cell-text
+{ margin-left: 2px; }
+
+treechildren::-moz-tree-cell-text(userNode)
+{ color: #555 !important; }
+
+treechildren::-moz-tree-cell-text(userNode, selected)
+{ color: #fff !important; }

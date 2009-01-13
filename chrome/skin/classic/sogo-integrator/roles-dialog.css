@@ -1,0 +1,63 @@
+#rolesDialog
+{ width: 500px;
+  height: 200px;
+  padding: 0px;
+  margin: 0px; }
+
+#titleContent
+{ background-color: #fff;
+  color: #000;
+  height: 36px;
+  padding-top: .5em;
+  padding-left: 2em;
+  border-bottom: 1px solid #000; }
+
+#userTitle
+{ font-size: 10pt; }
+#defaultTitle, #titleUserName
+{ font-weight: bold;
+  font-size: 12pt;  }
+
+.acl-close-button
+{ -moz-box-orient: vertical;
+  min-width: 0px;
+  -moz-image-region: rect(0px 24px 24px 0px);
+  list-style-image: url("chrome://sogo-integrator/skin/close-window.png"); }
+
+.acl-edit-button
+{ -moz-box-orient: vertical;
+  min-width: 0px;
+  -moz-image-region: rect(24px 48px 48px 24px);
+  list-style-image: url("chrome://calendar/skin/toolbar-large.png"); }
+
+#acl-toolbox separator
+{ width: 2px; }
+
+#dialogContent
+{ margin: 5px; }
+
+#addUserBtn
+{ padding: 0px;
+  margin: 0px;
+  border: 0px;
+  max-height: 24px;
+  -moz-image-region: rect(0px 24px 24px 0px);
+  list-style-image: url("chrome://sogo-integrator/skin/add-contact.gif"); }
+
+#removeUserBtn
+{ padding: 0px;
+  margin: 0px;
+  border: 0px;
+  max-height: 24px;
+  -moz-image-region: rect(0px 24px 24px 0px);
+  list-style-image: url("chrome://sogo-integrator/skin/remove-contact.gif"); }
+
+#entriesToolbar
+{ height: 36px; }
+
+#roleChoices
+{ width: 200px; }
+
+#rowLabel
+{ -moz-box-align: end;
+  text-align: right; }
