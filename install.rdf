@@ -11,8 +11,9 @@
   <Description about="urn:mozilla:install-manifest"
     em:name="SOGo Thunderbird Integrator"
     em:id="sogo-integrator@inverse.ca"
-    em:version="0.90pre28"
+    em:version="0.91"
     em:description="A SOGo integration plugin for Thunderbird"
+    em:iconURL="chrome://sogo-connector/skin/addressbook/sogo.png"
     em:creator="Inverse &lt;support@inverse.ca>"
     em:developer="Wolfgang Sourdeau &lt;wsourdeau@inverse.ca&gt;">
     <em:targetApplication resource="rdf:#$Iwquq2"/>
