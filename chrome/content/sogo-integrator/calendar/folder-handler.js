@@ -1,4 +1,4 @@
-/* -*- Mode: javascript; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+/* -*- Mode: javascript; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 function CalendarHandler() {
 	this.doubles = [];

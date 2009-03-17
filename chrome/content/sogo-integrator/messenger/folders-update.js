@@ -213,34 +213,44 @@ function checkFolders() {
 		if (proceed) {
 			/* sogo-connector is recent enough for a clean synchronization,
 				 otherwise, missing messy symbols will cause exceptions to be thrown */
-			var handler = new CalendarHandler();
-			var CalendarChecker = new directoryChecker("Calendar", handler);
-			var prefService = (Components.classes["@mozilla.org/preferences-service;1"]
-												 .getService(Components.interfaces.nsIPrefBranch));
-			var disableCalendaring;
-			try {
-				disableCalendaring
-					= prefService.getBoolPref("sogo-integrator.disable-calendaring");
-			}
-			catch(e) {
-				disableCalendaring = false;
-			}
-// 			dump("disable: " + disableCalendaring + "\n");
-			if (disableCalendaring) {
-				CalendarChecker.removeAllExisting();
-				hideLightningWidgets("true");
-			}
-			else {
-				handler.removeHomeCalendar();
-				CalendarChecker.start();
-				hideLightningWidgets("false");
-			}
 
-			handler = new AddressbookHandler();
+			var handler = new AddressbookHandler();
 			var ABChecker = new directoryChecker("Contacts", handler);
 			ABChecker.start();
 			handler.ensurePersonalIsRemote();
 			handler.ensureAutoComplete();
+
+			try {
+				handler = new CalendarHandler();
+			}
+			catch(e) {
+				// if lightning is not installed, an exception will be thrown so we
+				// need to catch it to keep the synchronization process alive
+				handler = null;
+			}
+			if (handler) {
+				var CalendarChecker = new directoryChecker("Calendar", handler);
+				var prefService = (Components.classes["@mozilla.org/preferences-service;1"]
+													 .getService(Components.interfaces.nsIPrefBranch));
+				var disableCalendaring;
+				try {
+					disableCalendaring
+						= prefService.getBoolPref("sogo-integrator.disable-calendaring");
+				}
+				catch(e) {
+					disableCalendaring = false;
+				}
+				// 			dump("disable: " + disableCalendaring + "\n");
+				if (disableCalendaring) {
+					CalendarChecker.removeAllExisting();
+					hideLightningWidgets("true");
+				}
+				else {
+					handler.removeHomeCalendar();
+					CalendarChecker.start();
+					hideLightningWidgets("false");
+				}
+			}
 		}
 	} else {
 		var console = Components.classes["@mozilla.org/consoleservice;1"]
