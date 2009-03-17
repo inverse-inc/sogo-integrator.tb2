@@ -31,6 +31,24 @@ function sogoIntegratorStartupOverlayOnLoad() {
 		dump("Custom preference code not available.\ne: " + e + "\n");
 	}
 
+	try {
+ 		loader.loadSubScript("chrome://sogo-integrator/content/general/startup.js");
+ 		try {
+ 			CustomStartup();
+ 		}
+ 		catch(customE) {
+ 			dump("An exception occured during execution of custom startup"
+ 					 + " code.\nException: " + customE
+ 					 + "\nFile: " + customE.fileName
+ 					 + "\nLine: " + customE.lineNumber
+ 					 + "\n\n Stack:\n\n" + customE.stack);
+ 		}
+ 		dump("Custom startup code executed\n");
+ 	}
+ 	catch(e) {
+ 		dump("Custom startup code not available.\ne: " + e + "\n");
+ 	}
+
 	if (typeof(getCompositeCalendar) == "undefined"
 			|| !_setupCalStartupObserver()) {
 		openUpdateDialog();
