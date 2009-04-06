@@ -1,3 +1,13 @@
+2009-04-06  Ludovic Marcotte <lmarcotte@inverse.ca>
+
+	* Bumped version number to 0.93
+
+2009-03-26  Ludovic Marcotte <lmarcotte@inverse.ca>
+
+        * chrome/content/sogo-integrator/messenger/update-dialog.js
+	We now use eForceQuit when restarting Thunderbird
+	after an extension update / removal.
+
 2009-02-23  Ludovic Marcotte <lmarcotte@inverse.ca>
 
 	* Added German translation. Patch from

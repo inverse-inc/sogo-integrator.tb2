@@ -1,4 +1,4 @@
-0.9x
+0.92
 ----
 - added the ability to force user preferences by adding a file named "chrome/content/sogo-integrator/content/general/custom-preferences.js"
 - added the ability to remove installed extensions by setting the version number to "disabled" in updates.php (SOGo's update server)

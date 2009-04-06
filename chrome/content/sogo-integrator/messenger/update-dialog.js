@@ -378,7 +378,7 @@ function updateDialogOnReload() {
 	var appStartup = iCc["@mozilla.org/toolkit/app-startup;1"]
 		.getService(iCi.nsIAppStartup);
 	appStartup.quit(iCi.nsIAppStartup.eRestart
-									| iCi.nsIAppStartup.eAttemptQuit);
+									| iCi.nsIAppStartup.eForceQuit);
 }
 
 function updateDialogOnLoadReal () {
