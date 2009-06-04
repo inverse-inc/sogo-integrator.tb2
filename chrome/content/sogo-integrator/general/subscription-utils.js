@@ -16,13 +16,33 @@ function jsInclude(files, target) {
 jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://inverse-library/content/sogoWebDAV.js"]);
 
+function escapedUserName(original) {
+	var conversionTable = {"_": "_U_",
+												 "\\.": "_D_",
+												 "#": "_H_",
+												 "@": "_A_",
+												 "\\*": "_S_",
+												 ":": "_C_",
+												 ",": "_CO_",
+												 " ": "_SP_"};
+	
+	var escapedString = original;
+	var re;
+	for (var conversionChar in conversionTable) {
+		re = new RegExp(conversionChar, 'g');
+		escapedString = escapedString.replace(re, conversionTable[conversionChar]);
+	}
+
+	return escapedString;
+}
+
 function subscriptionURL(url) {
 	var currentUser = sogoUserName();
 	var urlArray = url.split("/");
 	var urlUser = urlArray[5];
 	urlArray[5] = currentUser;
 	var urlFolder = urlArray[7];
-	urlArray[7] = urlUser + "_" + urlFolder;
+	urlArray[7] = escapedUserName(urlUser) + "_" + urlFolder;
 
 	return urlArray.join("/");
 }
