@@ -1,3 +1,9 @@
+2009-06-05  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/folder-handler.js: we no
+	longer invoke "calCalendarManager.registerCalendar" since creating
+	a cached calendar will register it automatically.
+
 2009-06-03  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/global/common-dialog-overlay.js:

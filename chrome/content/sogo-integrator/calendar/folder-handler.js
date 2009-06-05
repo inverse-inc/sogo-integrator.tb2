@@ -3,11 +3,12 @@
 function CalendarHandler() {
 	this.doubles = [];
   this.mgr = (Components.classes["@mozilla.org/calendar/manager;1"]
-							.getService(Components.interfaces.calICalendarManager));
+              .getService(Components.interfaces.calICalendarManager)
+              .wrappedJSObject);
 }
 
 CalendarHandler.prototype = {
-	getExistingDirectories: function getExistingDirectories() {
+  getExistingDirectories: function getExistingDirectories() {
     var existing = {};
 
     var count = {};
@@ -87,7 +88,7 @@ CalendarHandler.prototype = {
     for (var i = 0; i < newDirs.length; i++) {
       var newURI = ioSvc.newURI(newDirs[i]['url'], null, null);
       var newCalendar = this.mgr.createCalendar("caldav", newURI, true);
-			this.mgr.registerCalendar(newCalendar);
+//  			this.mgr.registerCalendar(newCalendar);
 			this._setDirectoryProperties(newCalendar, newDirs[i], true);
 			aclMgr.calendarEntry(newURI);
     }
