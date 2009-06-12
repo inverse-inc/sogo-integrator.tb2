@@ -1,3 +1,9 @@
+2009-06-12  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/subscription-dialog.js:
+	prevent users from subscribing twice to a folder they have already
+	subscribed to. Put the current subscriptions in gray.
+
 2009-06-05  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/calendar/folder-handler.js: we no

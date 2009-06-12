@@ -11,8 +11,10 @@ tree[searching="done"]
 treechildren::-moz-tree-cell-text
 { margin-left: 2px; }
 
-treechildren::-moz-tree-cell-text(userNode)
+treechildren::-moz-tree-cell-text(userNode),
+treechildren::-moz-tree-cell-text(folderNode, subscribed)
 { color: #555 !important; }
 
-treechildren::-moz-tree-cell-text(userNode, selected)
+treechildren::-moz-tree-cell-text(userNode, selected),
+treechildren::-moz-tree-cell-text(folderNode, subscribed, selected)
 { color: #fff !important; }

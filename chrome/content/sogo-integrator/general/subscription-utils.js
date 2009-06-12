@@ -119,6 +119,28 @@ function _deferredSubscription(nodeURL, target) {
 						+ "<subscribe xmlns=\"urn:inverse:params:xml:ns:inverse-dav\"/>");
 }
 
+function isSubscribedToFolder(folderURL) {
+	var result = false;
+
+	var testURL = subscriptionURL(folderURL);
+
+	if (subscriptionGetHandler) {
+		var handler = subscriptionGetHandler();
+		var existing = handler.getExistingDirectories();
+		for (var url in existing) {
+			var oldURL = url;
+			if (url[url.length - 1] != '/')
+				url = url.concat('/');
+			if (url == testURL) {
+				result = true;
+				break;
+			}
+		}
+	}
+
+	return result;
+}
+
 function unsubscribeFromFolder(nodeURL, handler) {
 	var existingFolder = null;
   var existing = handler.getExistingDirectories();

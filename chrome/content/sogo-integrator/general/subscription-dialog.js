@@ -20,6 +20,10 @@ var resourceType;
 
 window.addEventListener("load", onSubscriptionDialog, false);
 
+function isSubscribed(node) {
+	return window.opener.isSubscribedToFolder(node["href"]);
+}
+
 function onSubscriptionDialog() {
 	resourceType = window.opener.subscriptionDialogType();
 	var button = document.getElementById("addButton");
@@ -50,12 +54,19 @@ function onAddButtonClick(event) {
 		}
 		else {
 			var index = tree.treeView.getParentIndex(tree.treeView.selection.currentIndex);
-			var name = node["displayName"] + " (" + tree.treeView.getCellText(index, 0) + ")";
-			var folder = {url: node["href"],
-										owner: node["owner"],
-										displayName: name};
-			if (window.opener.subscribeToFolder(folder))
-				window.setTimeout(close, 30);
+			if (isSubscribed(node)) {
+				var strings = document.getElementById("subscription-dialog-strings");
+				window.alert(strings.getString("You have already subscribed to that folder!"));
+			}
+			else {
+				var name = (node["displayName"]
+										+ " (" + tree.treeView.getCellText(index, 0) + ")");
+				var folder = {url: node["href"],
+											owner: node["owner"],
+											displayName: name};
+				if (window.opener.subscribeToFolder(folder))
+					window.setTimeout(close, 30);
+			}
 		}
 	}
 }
@@ -309,7 +320,10 @@ SubscriptionTreeView.prototype = {
 					for (var folderCount = 0;
 							 folderCount < userData.folders.length;
 							 folderCount++) {
-						rows[i] = ["folderNode"];
+						var newProperties = ["folderNode"];
+						if (isSubscribed(userData.folders[folderCount]))
+							newProperties.push("subscribed");
+						rows[i] = newProperties;
 						i++;
 					}
 				}
