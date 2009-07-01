@@ -7,6 +7,20 @@ function CalendarHandler() {
               .wrappedJSObject);
 }
 
+var _topmostWindow = null;
+
+function topmostWindow() {
+    if (!_topmostWindow) {
+        var currentTop = window;
+        while (currentTop.opener)
+            currentTop = currentTop.opener;
+
+        _topmostWindow = currentTop;
+    }
+
+    return _topmostWindow;
+}
+
 CalendarHandler.prototype = {
   getExistingDirectories: function getExistingDirectories() {
     var existing = {};
@@ -79,10 +93,10 @@ CalendarHandler.prototype = {
 	},
 	addDirectories: function addDirectories(newDirs) {
     var ioSvc = Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService);
+                .getService(Components.interfaces.nsIIOService);
  		var aclMgr = Components.classes["@inverse.ca/calendar/caldav-acl-manager;1"]
-		.getService(Components.interfaces.nsISupports)
-		.wrappedJSObject;
+                 .getService(Components.interfaces.nsISupports)
+                 .wrappedJSObject;
 
  		dump("addDirectories\n");
     for (var i = 0; i < newDirs.length; i++) {
@@ -90,7 +104,7 @@ CalendarHandler.prototype = {
       var newCalendar = this.mgr.createCalendar("caldav", newURI, true);
 //  			this.mgr.registerCalendar(newCalendar);
 			this._setDirectoryProperties(newCalendar, newDirs[i], true);
-			aclMgr.calendarEntry(newURI);
+      topmostWindow().setTimeout(function() { aclMgr.calendarEntry(newURI); }, 0);
     }
   },
 	renameDirectories: function renameDirectories(dirs) {

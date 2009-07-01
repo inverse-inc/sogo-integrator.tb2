@@ -91,76 +91,72 @@ directoryChecker.prototype = {
 		if (fixedURL[fixedURL.length - 1] != '/')
 			fixedURL = fixedURL.concat('/');
 
-		if (firstURL != fixedURL)
-			dump("fixed url: " + fixedURL + "\n");
+// 		if (firstURL != fixedURL)
+// 			dump("fixed url: " + fixedURL + "\n");
 
 		return fixedURL;
 	},
- fixedResult: function fixedResult(oldResult) {
-    var newResult = {};
+ foldersFromResponse: function foldersFromResponse(jsonResponse) {
+    var folders = {};
     var username = sogoUserName();
 
-    for (var url in oldResult) {
-      var oldURL = url;
-			url = this._fixedURL(url);
-			var propResult = oldResult[oldURL][200];
-			var urlArray = url.split("/");
-      if (urlArray[urlArray.length-3] == this.type) {
-				var owner = this._fixedOwner("" + propResult['owner']['href']);
-				var additionalProps = [];
+		var responses = jsonResponse["multistatus"][0]["response"];
+		for (var i = 0; i < responses.length; i++) {
+			var url = this._fixedURL(responses[i]["href"][0]);
+			var propstats = responses[i]["propstat"];
+			for (var j = 0; j < propstats.length; j++) {
+				if (propstats[j]["status"][0].indexOf("HTTP/1.1 200") == 0) {
+					var urlArray = url.split("/");
+					if (urlArray[urlArray.length-3] == this.type) {
+            var prop = propstats[j]["prop"][0];
+						var owner = this._fixedOwner("" + prop["owner"][0]["href"][0]);
+						var additionalProps = [];
 
-				if (this.additionalProperties) {
-					for (var i = 0; i < this.additionalProperties.length; i++) {
-						var prop = this.additionalProperties[i].split(" ")[1];
+						if (this.additionalProperties) {
+							for (var k = 0; k < this.additionalProperties.length; k++) {
+								var pName = this.additionalProperties[k].split(" ")[1];
 
-						var newValue;
-						if (propResult[prop])
-							newValue = xmlUnescape(propResult[prop]);
-						else
-							newValue = null;
+								var newValue;
+								if (prop[pName])
+									newValue = xmlUnescape(prop[pName][0]);
+								else
+									newValue = null;
 
-						additionalProps.push(newValue);
+								additionalProps.push(newValue);
+							}
+						}
+						var newEntry = {owner: owner,
+														displayName: xmlUnescape(prop["displayname"][0]),
+														url: url,
+														additional: additionalProps};
+						folders[url] = newEntry;
 					}
 				}
-				var newEntry = {owner: owner,
-												displayName: xmlUnescape(propResult['displayname']),
-												url: url,
-												additional: additionalProps};
-				newResult[url] = newEntry;
       }
     }
 
-    return newResult;
+    return folders;
   },
- onDAVQueryComplete: function onDAVQueryComplete(status, result) {
+ onDAVQueryComplete: function onDAVQueryComplete(status, response) {
 		// dump("status: " + status + "\n");
 		if (status > 199 && status < 400) {
-			var count = 0;
-			for (var url in result)
-				count++;
-			if (count > 0) {
-				var existing
-					= this.fixedExisting(this.handler.getExistingDirectories());
-				this.handler.removeDoubles();
-				var newResult = this.fixedResult(result);
-				var comparison = this.compareDirectories(existing, newResult);
-				if (comparison['removed'].length)
-					this.handler.removeDirectories(comparison['removed']);
-				if (comparison['renamed'].length)
-					this.handler.renameDirectories(comparison['renamed']);
-				if (comparison['added'].length)
-					this.handler.addDirectories(comparison['added']);
-			}
-			else
-				dump("Server returned no url in its response. Ignoring.\n");
+			var existing
+			= this.fixedExisting(this.handler.getExistingDirectories());
+			this.handler.removeDoubles();
+			var folders = this.foldersFromResponse(response);
+			var comparison = this.compareDirectories(existing, folders);
+			if (comparison['removed'].length)
+				this.handler.removeDirectories(comparison['removed']);
+			if (comparison['renamed'].length)
+				this.handler.renameDirectories(comparison['renamed']);
+			if (comparison['added'].length)
+				this.handler.addDirectories(comparison['added']);
 		}
 		else
 			dump("the status code (" + status + ") was not acceptable, we therefore do nothing\n");
   },
  compareDirectories: function compareDirectories(existing, result) {
-    var comparison = { removed: new Array(),
-											 renamed: new Array(),
-											 added: new Array() };
+    var comparison = { removed: [], renamed: [], added: [] };
     for (var url in result) {
       if (url[url.length - 1] != '/')
 				url = url.concat('/');

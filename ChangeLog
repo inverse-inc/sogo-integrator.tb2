@@ -1,3 +1,10 @@
+2009-07-01  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/folder-handler.js: we
+	invoke the ACL entry for the corresponding calendar from the
+	topmost window through setTimeout so that no XMLRequest error
+	occurs when the calling window is closed.
+
 2009-06-12  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/general/subscription-dialog.js:
