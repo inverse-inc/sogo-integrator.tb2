@@ -22,7 +22,7 @@ jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://sogo-connector/content/common/common-dav.js"]);
 
 function AddressbookHandler() {
-	this.doubles = [];
+	this.doubles = {};
 }
 
 AddressbookHandler.prototype = {
@@ -54,7 +54,7 @@ AddressbookHandler.prototype = {
 			}
 			if (abURL) {
 				if (existing[abURL])
-					this.doubles.push(ab);
+					this.doubles[ab.dirName] = ab;
 				else
 					existing[abURL] = realAB;
 			}
@@ -64,7 +64,13 @@ AddressbookHandler.prototype = {
   },
  removeDoubles: function() {
 // 		dump("doubles:  " + this.doubles.length + "\n");
-		SCDeleteDirectories(this.doubles);
+		var newDoubles = [];
+		/* we need to  use as hash here to ensure each abDirectory is only present
+			 once. */
+		for (var dirName in this.doubles) {
+			newDoubles.push(this.doubles[dirName]);
+		}
+		SCDeleteDirectories(newDoubles);
 	},
  addDirectories: function(newDirs) {
     for (var i = 0; i < newDirs.length; i++) {
