@@ -274,7 +274,8 @@ function installDownloadedExtensions() {
 function restartIfPossible() {
 	if (this.downloadsDone && this.configurationDone && this.uninstallDone) {
 		if (errorsHappened) {
-			window.opener.checkSystemFolders();
+			if (window.opener)
+				window.opener.checkSystemFolders();
 			window.close();
 		}
 		else {
@@ -403,13 +404,15 @@ function updateDialogOnLoadReal () {
 			this.uninstallCurrentExtensions(results["uninstall"]);
 		}
 		else {
-			window.opener.checkSystemFolders();
+			if (window.opener)
+				window.opener.checkSystemFolders();
 			window.close();
 		}
 	}
 	catch(e) {
 		logString("updateDialogOnLoad: " + e);
-		window.opener.checkSystemFolders();
+		if (window.opener)
+			window.opener.checkSystemFolders();
 		window.close();
 	}
 }
