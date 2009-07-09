@@ -1,0 +1,11 @@
+<!ENTITY roles-dialog.title "Bewerken van machtigingen">
+<!ENTITY roles-dialog.default-roles.label "Standaardmachtigingen">
+<!ENTITY roles-dialog.user-roles.label "Machtigingen voor:">
+
+<!ENTITY roles-dialog.roles.object-creator.label "Deze persoon mag contactpersonen toevoegen aan dit adresboek.">
+<!ENTITY roles-dialog.roles.object-viewer.label "Deze persoon mag contactinformatie lezen in dit adresboek.">
+<!ENTITY roles-dialog.roles.object-editor.label "Deze persoon mag de contactinformatie in dit adresboek aanpassen.">
+<!ENTITY roles-dialog.roles.object-eraser.label "Deze persoon mag contactpersonen verwijderen uit dit adresboek.">
+
+<!ENTITY roles-dialog.update-button.label "Bijwerken">
+<!ENTITY roles-dialog.cancel-button.label "Annuleren">
