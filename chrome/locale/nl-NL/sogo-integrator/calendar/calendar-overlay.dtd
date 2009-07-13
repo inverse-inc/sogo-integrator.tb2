@@ -1,0 +1,6 @@
+<!ENTITY calendar-overlay.susbcription.tooltips.add
+ "Nieuwe agenda...">
+<!ENTITY calendar-overlay.susbcription.tooltips.subscribe
+ "Abonneren op agenda...">
+<!ENTITY calendar-overlay.susbcription.tooltips.remove
+ "Verwijder de geselecteerde agenda">

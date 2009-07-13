@@ -1,0 +1,7 @@
+<!ENTITY calendar.context.properties.label "Wijzigen">
+<!ENTITY calendar.context.sogo-reload-acls.label "Toegangsrechten herladen">
+<!ENTITY calendar.context.sogo-acls.label "Delen...">
+<!ENTITY calendar.context.showonly.label "Toon alleen deze agenda">
+<!ENTITY calendar.context.showall.label "Toon alle agenda's">
+<!ENTITY calendar.context.sogo-delete.label "Verwijder agenda">
+<!ENTITY calendar.context.sogo-unsubscribe.label "Uitschrijven voor agenda">

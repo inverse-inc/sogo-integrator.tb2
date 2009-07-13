@@ -1,0 +1,19 @@
+<!ENTITY roles-dialog.title "Bewerken van machtigingen">
+<!ENTITY roles-dialog.default-roles.label "Standaardmachtigingen">
+<!ENTITY roles-dialog.user-roles.label "Machtigingen voor:">
+
+<!ENTITY roles-dialog.roles-choice.view-all.label "Alles inzien">
+<!ENTITY roles-dialog.roles-choice.view-d-a-t.label "Alleen datum en tijd inzien">
+<!ENTITY roles-dialog.roles-choice.modify.label "Aanpassen">
+<!ENTITY roles-dialog.roles-choice.respond-to.label "Reageren op">
+<!ENTITY roles-dialog.roles-choice.none.label "Geen toegang">
+
+<!ENTITY roles-dialog.public.label "Publiek">
+<!ENTITY roles-dialog.confidential.label "Vertrouwelijk">
+<!ENTITY roles-dialog.private.label "Priv&#233;">
+
+<!ENTITY roles-dialog.roles.object-creator.label "Deze persoon kan afspraken in mijn agenda plaatsen.">
+<!ENTITY roles-dialog.roles.object-eraser.label "Deze persoon mag afspraken verwijderen uit mijn agenda.">
+
+<!ENTITY roles-dialog.update-button.label "Bijwerken">
+<!ENTITY roles-dialog.cancel-button.label "Annuleren">

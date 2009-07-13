@@ -1,0 +1,10 @@
+<!ENTITY acl-dialog.title "Rechtenbeheer">
+
+<!ENTITY acl.toolbar.close.label "Sluiten">
+<!ENTITY acl.toolbar.edit.label "Rechten bewerken">
+
+<!ENTITY acl.owner.label "Eigenaar:">
+<!ENTITY acl.defaultRoles.label "Standaardrollen">
+
+<!ENTITY acl.addUser.label "Toevoegen...">
+<!ENTITY acl.removeUser.label "Verwijderen">
