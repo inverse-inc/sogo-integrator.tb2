@@ -192,7 +192,6 @@ AddressbookHandler.prototype = {
 			prefACURL = null;
 		}
 		if (prefACURL) {
-			dump("ac url: " + prefACURL + "\n");
 			var existing = this.getExistingDirectories();
 			var acAB = existing[prefACURL];
 			if (!acAB) {

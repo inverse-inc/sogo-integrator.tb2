@@ -1,3 +1,17 @@
+2009-07-17  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/messenger/startup-overlay.js:
+	certain unavailable calendars may not return an "onLoad" when the
+	network is down. Since the update window is no longer modal, we
+	can redisplay it unconditionnally without fearing a deadlock.
+
+2009-07-15  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	*
+	chrome/content/sogo-integrator/calendar/calendar-summary-dialog.xul:
+	new overlay, displaying the name of the item calendar in the upper
+	right corner.
+
 2009-07-08  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/calendar/folder-handler.js: we no
