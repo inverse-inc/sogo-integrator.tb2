@@ -49,7 +49,61 @@ function sogoIntegratorStartupOverlayOnLoad() {
         dump("Custom startup code not available.\ne: " + e + "\n");
     }
 
-    openUpdateDialog();
+    if (typeof(getCompositeCalendar) == "undefined"
+        || !_setupCalStartupObserver()) {
+        openUpdateDialog();
+    }
+}
+
+//
+// Work-around a bug in the SSL code which seems to hang Thunderbird when
+// calendars are refreshing and extensions updates are being checked...
+//
+function _setupCalStartupObserver() {
+	var handled = false;
+
+	var compCalendar = getCompositeCalendar();
+	var calDavCount = 0;
+	var calendars = compCalendar.getCalendars({});
+	for each (var calendar in calendars) {
+      if (calendar.type == "caldav"
+          && !calendar.getProperty("disabled")) {
+          calDavCount++;
+      }
+  }
+
+	dump("need to start after: " + calDavCount + " cals\n");
+
+	if (calDavCount > 0) {
+// composite observer
+      var SICalStartupObserver = {
+      counter: 0,
+      maxCount: calDavCount,
+      onLoad: function(calendar) {
+              this.counter++;
+              dump("counter: " + this.counter + "\n");
+              if (this.counter >= this.maxCount) {
+                  dump("removing observer\n");
+                  compCalendar.removeObserver(this);
+                  dump("update dialog from observer\n");
+                  openUpdateDialog();
+              }
+          },
+      onStartBatch: function(calendar) {},
+      onEndBatch: function(calendar) {},
+      onAddItem: function(aItem) {},
+      onModifyItem: function(newItem, oldItem) {},
+      onDeleteItem: function(aItem) {},
+      onError: function(calendar, errNo, msg) {},
+      onPropertyChanged: function(aCalendar, aName, aValue, aOldValue) {},
+      onPropertyDeleting: function(aCalendar, aName) {}
+      };
+
+      compCalendar.addObserver(SICalStartupObserver);
+      handled = true;
+	}
+
+	return handled;
 }
 
 function _getVersionTags(versionString) {
