@@ -46,6 +46,10 @@ function onSubscriptionDialog() {
 
 function onAddButtonClick(event) {
 	var tree = document.getElementById("subscriptionTree");
+
+	if (!tree || !tree.treeView)
+		return;
+	
 	var node = tree.treeView.getSelectedNode();
 	if (node) {
 		if (resourceType == "users") {

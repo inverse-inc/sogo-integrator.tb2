@@ -122,6 +122,9 @@ function _deferredSubscription(nodeURL, target) {
 function isSubscribedToFolder(folderURL) {
 	var result = false;
 
+	if (!folderURL)
+		return result;
+
 	var testURL = subscriptionURL(folderURL);
 
 	if (subscriptionGetHandler) {

@@ -62,7 +62,8 @@ $(XPI_ARCHIVE): $(FILENAMES)
 	fi
 
 clean:
-	rm -f MANIFEST-pre $(XPI_ARCHIVE)
+	rm -f MANIFEST-pre
+	rm -f *.xpi
 	find -name "*~" -exec rm -f {} \;
 
 distclean: clean
