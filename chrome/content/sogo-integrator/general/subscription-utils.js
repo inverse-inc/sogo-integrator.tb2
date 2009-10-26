@@ -86,6 +86,10 @@ function subscribeToFolder(node) {
 
 	if (nodeURL[nodeURL.length - 1] != '/')
 		nodeURL = nodeURL.concat('/');
+
+	if (nodeURL[0] == '/')
+		nodeURL = sogoHostname() + nodeURL;
+
 	var folderURL = subscriptionURL(nodeURL);
 
 	var doesExist = false;
@@ -124,6 +128,9 @@ function isSubscribedToFolder(folderURL) {
 
 	if (!folderURL)
 		return result;
+
+	if (folderURL[0] == '/')
+		folderURL = sogoHostname() + folderURL;
 
 	var testURL = subscriptionURL(folderURL);
 

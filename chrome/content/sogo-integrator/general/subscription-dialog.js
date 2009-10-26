@@ -53,10 +53,12 @@ function onAddButtonClick(event) {
     var node = tree.treeView.getSelectedNode();
     if (node) {
         if (resourceType == "users") {
-            if (window.opener.subscriptionAddUser(node))
+
+            if (window.opener.subscriptionAddUser(node)) {
                 window.setTimeout(close, 1);
+            }
         }
-        else {
+        else { 
             var index = tree.treeView.getParentIndex(tree.treeView.selection.currentIndex);
             if (isSubscribed(node)) {
                 var strings = document.getElementById("subscription-dialog-strings");
@@ -68,8 +70,9 @@ function onAddButtonClick(event) {
                 var folder = {url: node["href"],
                               owner: node["owner"],
                               displayName: name};
-                if (window.opener.subscribeToFolder(folder))
+                if (window.opener.subscribeToFolder(folder)) {
                     window.setTimeout(close, 30);
+                }
             }
         }
     }

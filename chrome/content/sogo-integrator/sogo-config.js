@@ -22,6 +22,16 @@ function sogoUserName() {
   return sogoConfig['username'];
 }
 
+function sogoHostname() {
+  var hostnameArray;
+  var baseURL;
+
+  baseURL = sogoBaseURL();
+  hostnameArray = baseURL.split("/");
+
+  return  hostnameArray[0] + "//" + hostnameArray[2];
+}
+
 function sogoBaseURL() {
   if (!sogoConfig['baseURL']) {
     var rdf = Components.classes["@mozilla.org/rdf/rdf-service;1"]

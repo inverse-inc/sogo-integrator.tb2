@@ -1,3 +1,10 @@
+2009-10-26  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+	* chrome/content/sogo-integrator/sogo-config.js
+	Added the sogoHostname() function.
+	* chrome/content/sogo-integrator/general/subscription-utils.js
+	Fixing subscription bugs with relative URLs 
+
 2009-10-05  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/general/subscription-dialog.js
