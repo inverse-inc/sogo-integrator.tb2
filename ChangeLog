@@ -1,3 +1,20 @@
+2009-11-26  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/calendar-common-sets.js
+	chrome/content/sogo-integrator/calendar/calendar-common-sets.xul:
+	new overlay to override the behavior of the "Delete Calendar"
+	menu option - ie., to correctly differentiate delete vs. unsubscribe
+	* chrome/content/sogo-integrator/calendar/calendars-list-overlay.js
+	We now correctly handle activation / desactivation of the menu
+	items when dealing with local/webdav calendars
+	* Bumped version to v0.98pre1
+
+2009-11-12  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/sogo-config.js (sogoBaseURL):
+	added the ability to specify another prefix than "/SOGo", based on
+	the "sogo-integrator.sogo-prefix" preference.
+
 2009-10-26  Ludovic Marcotte  <lmarcotte@inverse.ca>
 
 	* chrome/content/sogo-integrator/sogo-config.js
