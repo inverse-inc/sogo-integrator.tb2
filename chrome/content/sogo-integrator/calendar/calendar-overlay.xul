@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
- Copyright:     Inverse inc., 2007
+ Copyright:     Inverse inc., 2007-2009
  Author:        Wolfgang Sourdeau <wsourdeau@inverse.ca>
  Email:         support@inverse.ca
  URL:           http://inverse.ca
@@ -37,8 +37,8 @@
 		  src="chrome://sogo-integrator/locale/calendar/calendar-overlay.properties"/>
   </stringbundleset>
 
-  <modevbox id="calendar-list-pane">
-    <hbox id="subscriptionToolbar" insertbefore="calendar-listtree-pane">
+  <modevbox id="calendar-listtree-pane">
+    <hbox id="subscriptionToolbar" insertbefore="calendar-list-tree-widget" collapsed="true">
       <toolbarbutton id="addCalendarBtn"
 	image="chrome://sogo-integrator/skin/add-calendar.png"
 	command="calendar_create_calendar_command"

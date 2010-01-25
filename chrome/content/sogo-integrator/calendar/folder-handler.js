@@ -1,13 +1,28 @@
-/* -*- Mode: javascript; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+/* -*- Mode: javascript; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 function CalendarHandler() {
 	this.doubles = [];
   this.mgr = (Components.classes["@mozilla.org/calendar/manager;1"]
-							.getService(Components.interfaces.calICalendarManager));
+              .getService(Components.interfaces.calICalendarManager)
+              .wrappedJSObject);
+}
+
+var _topmostWindow = null;
+
+function topmostWindow() {
+    if (!_topmostWindow) {
+        var currentTop = window;
+        while (currentTop.opener)
+            currentTop = currentTop.opener;
+
+        _topmostWindow = currentTop;
+    }
+
+    return _topmostWindow;
 }
 
 CalendarHandler.prototype = {
-	getExistingDirectories: function getExistingDirectories() {
+  getExistingDirectories: function getExistingDirectories() {
     var existing = {};
 
     var count = {};
@@ -78,18 +93,14 @@ CalendarHandler.prototype = {
 	},
 	addDirectories: function addDirectories(newDirs) {
     var ioSvc = Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService);
- 		var aclMgr = Components.classes["@inverse.ca/calendar/caldav-acl-manager;1"]
-		.getService(Components.interfaces.nsISupports)
-		.wrappedJSObject;
+                .getService(Components.interfaces.nsIIOService);
 
  		dump("addDirectories\n");
     for (var i = 0; i < newDirs.length; i++) {
       var newURI = ioSvc.newURI(newDirs[i]['url'], null, null);
       var newCalendar = this.mgr.createCalendar("caldav", newURI, true);
-			this.mgr.registerCalendar(newCalendar);
+//  			this.mgr.registerCalendar(newCalendar);
 			this._setDirectoryProperties(newCalendar, newDirs[i], true);
-			aclMgr.calendarEntry(newURI);
     }
   },
 	renameDirectories: function renameDirectories(dirs) {

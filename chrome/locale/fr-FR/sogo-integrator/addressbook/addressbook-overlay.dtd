@@ -6,3 +6,6 @@
  "S'inscrire à un carnet d'adresses...">
 <!ENTITY addressbook-overlay.susbcription.tooltips.remove
  "Enlever le carnet d'adresses sélectionné">
+<!ENTITY addressbook-overlay.susbcription.tooltips.remove
+ "Enlever le carnet d'adresses sélectionné">
+<!ENTITY addressbook-overlay.subscription.menu.unsubscribe "Se désabonner">

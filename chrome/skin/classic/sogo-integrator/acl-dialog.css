@@ -14,8 +14,8 @@
   list-style-image: url("chrome://sogo-integrator/skin/close-window.png"); }
 
 #acl-edit-button
-{ -moz-image-region: rect(24px 48px 48px 24px);
-  list-style-image: url("chrome://calendar/skin/toolbar-large.png"); }
+{ -moz-image-region: rect(0px 24px 24px 0px);
+  list-style-image: url("chrome://sogo-integrator/skin/edit-rights.png"); }
 
 #throbber
 { width: 24px;

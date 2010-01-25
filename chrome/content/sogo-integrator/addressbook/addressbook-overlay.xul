@@ -10,7 +10,12 @@
 <?xml-stylesheet type="text/css" href="chrome://sogo-integrator/skin/addressbook-overlay.css"?>
 <?xml-stylesheet type="text/css" href="chrome://sogo-integrator/content/addressbook/addressbook-overlay.css"?>
 
-<!DOCTYPE overlay SYSTEM "chrome://sogo-integrator/locale/addressbook/addressbook-overlay.dtd">
+<!DOCTYPE overlay [
+<!ENTITY % SIABOverlay SYSTEM "chrome://sogo-integrator/locale/addressbook/addressbook-overlay.dtd" >
+%SIABOverlay;
+<!ENTITY % abMainWindowDTD SYSTEM "chrome://messenger/locale/addressbook/abMainWindow.dtd" >
+%abMainWindowDTD;
+]>
 
 <overlay id="inverseAddressbookOverlay"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -53,4 +58,8 @@
 	tooltiptext="&addressbook-overlay.susbcription.tooltips.remove;"/>
     </sidebarheader>
   </vbox>
+
+  <menuitem id="dirTreeContext-delete"
+    deletelabel="&deleteButton.label;"
+    unsubscribelabel="&addressbook-overlay.subscription.menu.unsubscribe;"/>
 </overlay>

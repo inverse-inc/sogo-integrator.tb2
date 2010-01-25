@@ -18,12 +18,11 @@ function jsInclude(files, target) {
 jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://sogo-connector/content/general/preference.service.addressbook.groupdav.js",
 					 "chrome://sogo-connector/content/general/sync.addressbook.groupdav.js",
-					 "chrome://sogo-connector/content/general/implementors.addressbook.groupdav.js",
 					 "chrome://sogo-connector/content/general/vcards.utils.js",
 					 "chrome://sogo-connector/content/common/common-dav.js"]);
 
 function AddressbookHandler() {
-	this.doubles = [];
+	this.doubles = {};
 }
 
 AddressbookHandler.prototype = {
@@ -55,7 +54,7 @@ AddressbookHandler.prototype = {
 			}
 			if (abURL) {
 				if (existing[abURL])
-					this.doubles.push(ab);
+					this.doubles[ab.dirName] = ab;
 				else
 					existing[abURL] = realAB;
 			}
@@ -65,7 +64,13 @@ AddressbookHandler.prototype = {
   },
  removeDoubles: function() {
 // 		dump("doubles:  " + this.doubles.length + "\n");
-		SCDeleteDirectories(this.doubles);
+		var newDoubles = [];
+		/* we need to  use as hash here to ensure each abDirectory is only present
+			 once. */
+		for (var dirName in this.doubles) {
+			newDoubles.push(this.doubles[dirName]);
+		}
+		SCDeleteDirectories(newDoubles);
 	},
  addDirectories: function(newDirs) {
     for (var i = 0; i < newDirs.length; i++) {
@@ -187,7 +192,6 @@ AddressbookHandler.prototype = {
 			prefACURL = null;
 		}
 		if (prefACURL) {
-			dump("ac url: " + prefACURL + "\n");
 			var existing = this.getExistingDirectories();
 			var acAB = existing[prefACURL];
 			if (!acAB) {

@@ -17,6 +17,7 @@ jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://sogo-integrator/content/addressbook/folder-handler.js",
 					 "chrome://sogo-integrator/content/general/creation-utils.js",
 					 "chrome://sogo-integrator/content/general/subscription-utils.js",
+					 "chrome://sogo-integrator/content/messenger/folders-update.js",
 					 "chrome://sogo-connector/content/general/preference.service.addressbook.groupdav.js",
 					 "chrome://sogo-connector/content/addressbook/folder-handling.js"]);
 
@@ -83,7 +84,7 @@ function onDeleteAbDirectory() {
 					var handler = new AddressbookHandler();
 					if (dirBase.indexOf("_") == -1) {
 						if (dirBase != 'personal') {
-							dump("should delete folder: " + url+ "\n");
+// 							dump("should delete folder: " + url+ "\n");
 							deleteFolder(url, handler);
 						}
 					}
@@ -133,12 +134,12 @@ SIDirPaneController.prototype = {
 					result = (dirBase.indexOf("_") == -1);
 				}
 			}
-		}
-		else if (command == "addressbook_delete_addressbook_command") {
+		} else if (command == "addressbook_delete_addressbook_command") {
 			var uri = GetSelectedDirectory();
 			if (uri) {
 				var cd;
 				var url;
+				var deleteMenuIsUnsubscribe = false;
 				var ab = SCGetDirectoryFromURI(uri);
 				if (isGroupdavDirectory(uri)) {
 					var prefs = new GroupdavPreferenceService(ab.dirPrefId);
@@ -157,12 +158,24 @@ SIDirPaneController.prototype = {
 					if (url.indexOf(sogoBaseURL()) == 0) {
 						if (!cd) {
 							var urlParts = url.split("/");
-							if (urlParts[urlParts.length - 2] != "personal")
+							var dirBase = urlParts[urlParts.length - 2];
+							if (dirBase != "personal") {
 								result = true;
+								deleteMenuIsUnsubscribe = (dirBase.indexOf("_") >= -1);
+							}
 						}
 					}
 					else
 						result = true;
+				}
+
+				var deleteMenuItem
+					= document.getElementById("dirTreeContext-delete");
+				if (deleteMenuIsUnsubscribe) {
+					deleteMenuItem.label
+						= deleteMenuItem.getAttribute("unsubscribelabel");
+				} else {
+					deleteMenuItem.label = deleteMenuItem.getAttribute("deletelabel");
 				}
 			}
 		}
@@ -222,6 +235,12 @@ function SIOnLoadHandler() {
 	this.AbDeleteDirectory = this.onDeleteAbDirectory;
 
 	SISetupAbCommandUpdateHandlers();
+
+	var toolbar = document.getElementById("subscriptionToolbar");
+	if (toolbar) {
+		var ABChecker = new directoryChecker("Contacts");
+		toolbar.collapsed = !ABChecker.checkAvailability();
+	}
 }
 
 window.addEventListener("load", SIOnLoadHandler, false);

@@ -97,7 +97,7 @@ function _SISetTitles() {
 	var description = box.getElementsByTagName('description')[0];
 
 	document.title = bundle.getString("sogo.title");
-	description.textContent = bundle.getString("sogo.description");
+	description.textContent = bundle.getString("sogo.description").replace("%u", sogoUserName());
 }
 
 function SICommonDialogOnLoad() {

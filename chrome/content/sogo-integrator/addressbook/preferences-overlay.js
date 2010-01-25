@@ -57,17 +57,22 @@ function renameTarget(dlg) {
 }
 
 renameTarget.prototype = {
- onDAVQueryComplete: function(status, result) {
+ onDAVQueryComplete: function(status, jsonResult) {
 		var correct = false;
 
 		if (status == 207) {
-			for (var k in result) {
-				if (this.dialog.folderURL.indexOf(k) > -1
-						&& result[k][200]
-						&& result[k][200]["displayname"]) {
-					if (onAccept())
-						setTimeout("window.close();", 200);
-					break;
+			var responses = jsonResult["multistatus"][0]["response"];
+			for each (var response in responses) {
+				var url = response["href"][0];
+				if (this.dialog.folderURL.indexOf(url) > -1) {
+					for each (var propstat in response["propstat"]) {
+						if (propstat["status"][0].indexOf("HTTP/1.1 200") == 0) {
+							if (propstat["prop"][0]["displayname"]) {
+								if (onAccept())
+									setTimeout("window.close();", 200);
+							}
+						}
+					}
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-0.9x
+0.92
 ----
 - added the ability to force user preferences by adding a file named "chrome/content/sogo-integrator/content/general/custom-preferences.js"
 - added the ability to remove installed extensions by setting the version number to "disabled" in updates.php (SOGo's update server)
@@ -7,6 +7,7 @@
 - added the possibility to show only the selected calendar or all of them
 - we now force immediately the creation of cached CalDAV calendars
 - we now immediately show the full name and email address of the subscribed calendar / address book
+- added the ability to add a custom startup script which will be executed when found in chrome://sogo-integrator/content/general/startup.js
 
 0.81
 ----

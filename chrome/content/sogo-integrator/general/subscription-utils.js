@@ -16,13 +16,33 @@ function jsInclude(files, target) {
 jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://inverse-library/content/sogoWebDAV.js"]);
 
+function escapedUserName(original) {
+	var conversionTable = {"_": "_U_",
+												 "\\.": "_D_",
+												 "#": "_H_",
+												 "@": "_A_",
+												 "\\*": "_S_",
+												 ":": "_C_",
+												 ",": "_CO_",
+												 " ": "_SP_"};
+	
+	var escapedString = original;
+	var re;
+	for (var conversionChar in conversionTable) {
+		re = new RegExp(conversionChar, 'g');
+		escapedString = escapedString.replace(re, conversionTable[conversionChar]);
+	}
+
+	return escapedString;
+}
+
 function subscriptionURL(url) {
 	var currentUser = sogoUserName();
 	var urlArray = url.split("/");
 	var urlUser = urlArray[5];
 	urlArray[5] = currentUser;
 	var urlFolder = urlArray[7];
-	urlArray[7] = urlUser + "_" + urlFolder;
+	urlArray[7] = escapedUserName(urlUser) + "_" + urlFolder;
 
 	return urlArray.join("/");
 }
@@ -66,6 +86,10 @@ function subscribeToFolder(node) {
 
 	if (nodeURL[nodeURL.length - 1] != '/')
 		nodeURL = nodeURL.concat('/');
+
+	if (nodeURL[0] == '/')
+		nodeURL = sogoHostname() + nodeURL;
+
 	var folderURL = subscriptionURL(nodeURL);
 
 	var doesExist = false;
@@ -97,6 +121,34 @@ function _deferredSubscription(nodeURL, target) {
 	var post = new sogoWebDAV(nodeURL, target);
 	post.post("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 						+ "<subscribe xmlns=\"urn:inverse:params:xml:ns:inverse-dav\"/>");
+}
+
+function isSubscribedToFolder(folderURL) {
+	var result = false;
+
+	if (!folderURL)
+		return result;
+
+	if (folderURL[0] == '/')
+		folderURL = sogoHostname() + folderURL;
+
+	var testURL = subscriptionURL(folderURL);
+
+	if (subscriptionGetHandler) {
+		var handler = subscriptionGetHandler();
+		var existing = handler.getExistingDirectories();
+		for (var url in existing) {
+			var oldURL = url;
+			if (url[url.length - 1] != '/')
+				url = url.concat('/');
+			if (url == testURL) {
+				result = true;
+				break;
+			}
+		}
+	}
+
+	return result;
 }
 
 function unsubscribeFromFolder(nodeURL, handler) {

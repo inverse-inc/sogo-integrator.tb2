@@ -6,3 +6,4 @@
  "Subscribe to an Addressbook...">
 <!ENTITY addressbook-overlay.susbcription.tooltips.remove
  "Remove the selected Addressbook">
+<!ENTITY addressbook-overlay.subscription.menu.unsubscribe "Unsubscribe">

@@ -38,15 +38,23 @@ _creationTarget.prototype = {
 													+ "</prop></set></propertyupdate>");
 		}
 	},
- onPropPatchQueryComplete: function(status, result) {
+ onPropPatchQueryComplete: function(status, jsonResult) {
 		if (status == 207) {
-			for (var k in result) {
-				if (this.folderURL.indexOf(k) > -1
-						&& result[k][200]
-						&& result[k][200]["displayname"])
-					this.handler.addDirectories([{url: this.folderURL,
-																				owner: sogoUserName(),
-																				displayName: this.displayName}]);
+			var responses = jsonResult["multistatus"][0]["response"];
+			for each (var response in responses) {
+				var url = response["href"][0];
+				if (this.folderURL.indexOf(url) > -1) {
+					for each (var propstat in response["propstat"]) {
+						if (propstat["status"][0].indexOf("HTTP/1.1 200") == 0) {
+							if (propstat["prop"][0]["displayname"]) {
+								var newFolder = {url: this.folderURL,
+																 owner: sogoUserName(),
+																 displayName: this.displayName};
+								this.handler.addDirectories([newFolder]);
+							}
+						}
+					}
+				}
 			}
 			if (this.target) {
 				this.target.onCreationDone();
