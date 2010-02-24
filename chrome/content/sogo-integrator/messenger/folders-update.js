@@ -37,6 +37,36 @@ function directoryChecker(type, handler) {
 directoryChecker.prototype = {
  additionalProperties: null,
  baseURL: sogoBaseURL(),
+ _checkHTTPAvailability: function checkAvailability() {
+        var available;
+
+        try {
+            var xmlRequest = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                                       .createInstance(Components.interfaces.nsIXMLHttpRequest);
+            xmlRequest.open("OPTIONS", this.baseURL + this.type, false);
+            xmlRequest.send("");
+            available = (xmlRequest.status != 404);
+        }
+        catch(e) {
+            available = true;
+        }
+
+        return available;
+    },
+ checkAvailability: function checkAvailability() {
+        var manager = Components.classes['@inverse.ca/context-manager;1']
+                                .getService(Components.interfaces.inverseIJSContextManager).wrappedJSObject;
+        var context = manager.getContext("inverse.ca/folders-update");
+        if (!context.availability)
+            context.availability = {};
+        var available = context.availability[this.type];
+        if (typeof (available) == "undefined") {
+            available = this._checkHTTPAvailability();
+            context.availability[this.type] = available;
+        }
+
+        return available;
+    },
  start: function start() {
         var propfind = new sogoWebDAV(this.baseURL + this.type, this);
         var baseProperties = ["DAV: owner", "DAV: displayname"];
@@ -208,15 +238,18 @@ function checkFolders() {
 
         if (proceed) {
             /* sogo-connector is recent enough for a clean synchronization,
-               otherwise, missing messy symbols will cause exceptions to be thrown */
+               otherwise, missing messy symbols will cause exceptions to be
+               thrown */
 
             cleanupAddressBooks();
             var handler = new AddressbookHandler();
             var ABChecker = new directoryChecker("Contacts", handler);
-            ABChecker.start();
-            handler.ensurePersonalIsRemote();
-            handler.ensureAutoComplete();
-            startFolderSync();
+            if (ABChecker.checkAvailability()) {
+                ABChecker.start();
+                handler.ensurePersonalIsRemote();
+                handler.ensureAutoComplete();
+                startFolderSync();
+            }
 
             try {
                 handler = new CalendarHandler();
@@ -228,24 +261,31 @@ function checkFolders() {
             }
             if (handler) {
                 var CalendarChecker = new directoryChecker("Calendar", handler);
-                var prefService = (Components.classes["@mozilla.org/preferences-service;1"]
-                                   .getService(Components.interfaces.nsIPrefBranch));
-                var disableCalendaring;
-                try {
-                    disableCalendaring
-                        = prefService.getBoolPref("sogo-integrator.disable-calendaring");
-                }
-                catch(e) {
-                    disableCalendaring = false;
-                }
-                if (disableCalendaring) {
-                    CalendarChecker.removeAllExisting();
-                    hideLightningWidgets("true");
-                }
-                else {
-                    handler.removeHomeCalendar();
-                    CalendarChecker.start();
-                    hideLightningWidgets("false");
+                if (CalendarChecker.checkAvailability()) {
+                    if (document) {
+                        var toolbar = document.getElementById("subscriptionToolbar");
+                        if (toolbar)
+                            toolbar.collapsed = false;
+                    }
+                    var prefService = (Components.classes["@mozilla.org/preferences-service;1"]
+                                       .getService(Components.interfaces.nsIPrefBranch));
+                    var disableCalendaring;
+                    try {
+                        disableCalendaring
+                            = prefService.getBoolPref("sogo-integrator.disable-calendaring");
+                    }
+                    catch(e) {
+                        disableCalendaring = false;
+                    }
+                    if (disableCalendaring) {
+                        CalendarChecker.removeAllExisting();
+                        hideLightningWidgets("true");
+                    }
+                    else {
+                        handler.removeHomeCalendar();
+                        CalendarChecker.start();
+                        hideLightningWidgets("false");
+                    }
                 }
             }
         }

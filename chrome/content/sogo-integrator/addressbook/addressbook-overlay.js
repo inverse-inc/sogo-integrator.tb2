@@ -17,6 +17,7 @@ jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://sogo-integrator/content/addressbook/folder-handler.js",
 					 "chrome://sogo-integrator/content/general/creation-utils.js",
 					 "chrome://sogo-integrator/content/general/subscription-utils.js",
+					 "chrome://sogo-integrator/content/messenger/folders-update.js",
 					 "chrome://sogo-connector/content/general/preference.service.addressbook.groupdav.js",
 					 "chrome://sogo-connector/content/addressbook/folder-handling.js"]);
 
@@ -234,6 +235,12 @@ function SIOnLoadHandler() {
 	this.AbDeleteDirectory = this.onDeleteAbDirectory;
 
 	SISetupAbCommandUpdateHandlers();
+
+	var toolbar = document.getElementById("subscriptionToolbar");
+	if (toolbar) {
+		var ABChecker = new directoryChecker("Contacts");
+		toolbar.collapsed = !ABChecker.checkAvailability();
+	}
 }
 
 window.addEventListener("load", SIOnLoadHandler, false);

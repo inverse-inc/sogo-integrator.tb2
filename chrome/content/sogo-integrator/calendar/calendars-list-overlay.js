@@ -14,7 +14,8 @@ function jsInclude(files, target) {
 	}
 }
 
-jsInclude(["chrome://sogo-integrator/content/sogo-config.js"]);
+jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
+					 "chrome://sogo-integrator/content/messenger/folders-update.js"]);
 
 window.addEventListener("load", onInverseCalendarsListOverlayLoad, false);
 
@@ -53,35 +54,45 @@ SICalendarListTreeController.prototype = {
   },
 
  isCommandEnabled: function(command) {
-	 
+    var isEnabled;
+
     if (command == "calendar_manage_sogo_acls_command") {
+      var acl_menuitem = document.getElementById("list-calendars-context-sogo-acls");
+      var delete_menuitem = document.getElementById("list-calendars-context-delete");
 
 			var calendar = getSelectedCalendar();
-			var acl_menuitem = document.getElementById("list-calendars-context-sogo-acls");
-			var delete_menuitem = document.getElementById("list-calendars-context-delete");
-
 			if (calendar.type == "caldav") {
-				var aclMgr = Components.classes["@inverse.ca/calendar/caldav-acl-manager;1"]
-					.getService(Components.interfaces.nsISupports)
-					.wrappedJSObject;
-				var entry = aclMgr.calendarEntry(calendar.uri);
-				
-				if (entry.userIsOwner()) {
-					acl_menuitem.label = acl_menuitem.getAttribute("managelabel");
-					delete_menuitem.label = delete_menuitem.getAttribute("deletelabel");
-				} else {
-					acl_menuitem.label = acl_menuitem.getAttribute("reloadlabel");
-					delete_menuitem.label = delete_menuitem.getAttribute("unsubscribelabel");
+        var aclMgr = Components.classes["@inverse.ca/calendar/caldav-acl-manager;1"]
+                               .getService(Components.interfaces.nsISupports)
+                               .wrappedJSObject;
+        var entry = aclMgr.calendarEntry(calendar.uri);
+        if (entry.userIsOwner()) {
+          acl_menuitem.label = acl_menuitem.getAttribute("managelabel");
+          delete_menuitem.label = delete_menuitem.getAttribute("deletelabel");
+        } else {
+          acl_menuitem.label = acl_menuitem.getAttribute("reloadlabel");
+          delete_menuitem.label = delete_menuitem.getAttribute("unsubscribelabel");
 				}
+
+				var length = sogoBaseURL().length;
+				if (calendar.uri.spec.substr(0, length) == sogoBaseURL()) {
+          var CalendarChecker = new directoryChecker("Calendar");
+          isEnabled = CalendarChecker.checkAvailability();
+        }
+        else
+          isEnabled = true;
 			}
 			else {
 				// For local/webdav calendars, we show the manage label and the delete one
 				acl_menuitem.label = acl_menuitem.getAttribute("managelabel");
 				delete_menuitem.label = delete_menuitem.getAttribute("deletelabel");
-				return false;
+				return isEnabled = false;
 			}
-		}
-		return true;
+		} else {
+      isEnabled = true;
+    }
+
+		return isEnabled;
   },
 
  doCommand: function(command) { dump("doCommand\n"); },

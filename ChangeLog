@@ -1,3 +1,21 @@
+2009-12-23  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js
+	(directoryChecker.checkAvailability): new methods that ensures
+	that the corresponding SOGo module is available, by first
+	executing an "OPTIONS" request on the container collection and
+	then caching the result for further invocations.
+	(checkFolders): make use of the new method above before triggering
+	any SOGo-specific setup.
+
+	* chrome/content/sogo-integrator/calendar/calendars-list-overlay.js
+	(isCommandEnabled): make the acl commands unavailable if the
+	"Calendar" module is not available in SOGo.
+
+	* chrome/content/sogo-integrator/addressbook/addressbook-overlay.js
+	(SIOnLoadHandler): collapse the toolbar is the "Contacts" module
+	is not available in SOGo.
+
 2009-11-26  Ludovic Marcotte  <lmarcotte@inverse.ca>
 
 	* chrome/content/sogo-integrator/calendar/calendar-common-sets.js
