@@ -243,7 +243,7 @@ SubscriptionTreeView.prototype = {
                 var value = subnode.firstChild.nodeValue;
                 nodeDict[key] = value;
             }
-            dump("pushing: " + nodeDict["id"] + "\n");
+            // dump("pushing: " + nodeDict["id"] + "\n");
             this.data.push(nodeDict);
         }
         this.rowCount = this.data.length;
@@ -359,7 +359,7 @@ SubscriptionTreeView.prototype = {
             var userRow = (userData["displayName"] + " <"
                            + userData["email"] + ">");
             if (userData["info"] && userData["info"].length) {
-                userRow += ", " + userData["info"];
+                userRow += ", " + userData["info"].split("\n").join("; ");
             }
             rows[i] = userRow;
             i++;
@@ -716,7 +716,7 @@ UsersTreeView.prototype = {
                 var value = subnode.firstChild.nodeValue;
                 nodeDict[key] = value;
             }
-            dump("pushing: " + nodeDict["id"] + "\n");
+            // dump("pushing: " + nodeDict["id"] + "\n");
             this.data.push(nodeDict);
         }
         this.rowCount = this.data.length;
@@ -737,7 +737,7 @@ UsersTreeView.prototype = {
         var infoText = "";
         if (this.data[rowIndex]["info"]
             && this.data[rowIndex]["info"].length) {
-            infoText = ", " + this.data[rowIndex]["info"];
+            infoText = ", " + this.data[rowIndex]["info"].split("\n").join("; ");
         }
         return (this.data[rowIndex]["displayName"]
                 + " <" + this.data[rowIndex]["email"] + ">"

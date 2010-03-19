@@ -169,18 +169,22 @@ directoryChecker.prototype = {
     },
  onDAVQueryComplete: function onDAVQueryComplete(status, response) {
         // dump("status: " + status + "\n");
-        if (status > 199 && status < 400) {
+        if (status > 199 && status < 400) {            
             var existing
             = this.fixedExisting(this.handler.getExistingDirectories());
             this.handler.removeDoubles();
-            var folders = this.foldersFromResponse(response);
-            var comparison = this.compareDirectories(existing, folders);
-            if (comparison['removed'].length)
-                this.handler.removeDirectories(comparison['removed']);
-            if (comparison['renamed'].length)
-                this.handler.renameDirectories(comparison['renamed']);
-            if (comparison['added'].length)
-                this.handler.addDirectories(comparison['added']);
+            if (response) {
+                var folders = this.foldersFromResponse(response);
+                var comparison = this.compareDirectories(existing, folders);
+                if (comparison['removed'].length)
+                    this.handler.removeDirectories(comparison['removed']);
+                if (comparison['renamed'].length)
+                    this.handler.renameDirectories(comparison['renamed']);
+                if (comparison['added'].length)
+                    this.handler.addDirectories(comparison['added']);
+            }
+            else
+                dump("an empty response was returned, we therefore do nothing\n");
         }
         else
             dump("the status code (" + status + ") was not acceptable, we therefore do nothing\n");

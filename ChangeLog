@@ -1,3 +1,24 @@
+2010-03-19  Ludovic Marcotte  <lmarcotte@inverse.ca>	
+
+	* chrome/content/sogo-integrator/calendar/folder-handler.js
+	We now automatically activate alarms when first adding
+	calendars on calendars that we own.
+
+2010-03-15  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/subscription-dialog.js:
+	"info" field can have multiple lines, which are then splitted and
+	reassembled with a "; " separator.
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js:
+	check that "response" is non-null before processing, for sanity.
+
+2010-03-10  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/properties-overlay.js
+	(onLoadOverlay): we no longer disable the name field as we now
+	permit the "renaming" of subscribed resources.
+
 2009-12-23  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/messenger/folders-update.js
