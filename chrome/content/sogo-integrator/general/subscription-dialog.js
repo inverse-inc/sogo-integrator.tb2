@@ -33,7 +33,7 @@ function onSubscriptionDialog() {
     tree.addEventListener("dblclick", onAddButtonClick, false);
 
     var searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("focus", onSearchInputFocus, false);
+    searchInput.inputField.addEventListener("focus", onSearchInputFocus, false);
     searchInput.inputField.addEventListener("blur", onSearchInputBlur, false);
     searchInput.addEventListener("click", onSearchInputFocus, false);
     searchInput.addEventListener("input", onSearchInputInput, false);
@@ -87,12 +87,13 @@ function onSearchInputBlur(event) {
 }
 
 function onSearchInputFocus(event) {
-    if (this.showingSearchCriteria) {
-        this.value = "";
-        this.showingSearchCriteria = false;
-    }
+    var searchInput = document.getElementById("searchInput");
 
-    this.select();
+    if (searchInput.showingSearchCriteria) {
+        searchInput.value = "";
+        searchInput.showingSearchCriteria = false;
+    }
+    searchInput.select();
 }
 
 function onSearchInputInput(event) {
@@ -101,6 +102,7 @@ function onSearchInputInput(event) {
         var tree = document.getElementById("subscriptionTree");
         tree.view = null;
         tree.setAttribute("searching", "none");
+        this.removeAttribute("searching");
         this.clean = true;
     }
 
@@ -115,6 +117,10 @@ function onSearchInputInput(event) {
 
 function onSearchInputKeyPress(event) {
     if (event.keyCode == 13) {
+        if (gSearchTimer) {
+            clearTimeout(gSearchTimer);
+            gSearchTimer = null;
+        }
         onStartSearch();
         event.preventDefault();
     }
@@ -125,6 +131,7 @@ function onClearSearch() {
     searchInput.value = "";
     searchInput.showingSearchCriteria = true;
     searchInput.clean = true;
+    searchInput.removeAttribute("searching");
     var tree = document.getElementById("subscriptionTree");
     tree.view = null;
     tree.setAttribute("searching", "none");
@@ -132,15 +139,25 @@ function onClearSearch() {
         clearTimeout(gSearchTimer);
         gSearchTimer = null;
     }
+    var button = document.getElementById("quick-search-clearbutton");
+    button.setAttribute("disabled", "true");
+    button.setAttribute("clearButtonHidden", "true");
 }
 
 var userReportTarget = {
- onDAVQueryComplete: function(status, result) {
+ onDAVQueryComplete: function(status, result, headers) {
         var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
                                .createInstance(Components.interfaces.nsIDOMParser);
-        var xmlResult = parser.parseFromString(result, "text/xml");
-        var treeView;
+        var xmlResult = null;
 
+        var contentType = headers["content-type"][0];
+        if ((contentType.indexOf("text/xml") > -1
+             || contentType.indexOf("application/xml") > -1)
+            && parseInt(headers["content-length"][0]) > 0) {
+            xmlResult = parser.parseFromString(result, "text/xml");
+        }
+
+        var treeView;
         if (resourceType == "users")
             treeView = new UsersTreeView(xmlResult);
         else
@@ -152,6 +169,14 @@ var userReportTarget = {
 
         var searchInput = document.getElementById("searchInput");
         searchInput.clean = false;
+        if (treeView.rowCount == 0) {
+            searchInput.setAttribute("searching", "notfound");
+        } else {
+            searchInput.removeAttribute("searching");
+        }
+
+        var throbber = document.getElementById("navigator-throbber");
+        throbber.setAttribute("busy", "false");
     }
 };
 
@@ -159,7 +184,15 @@ var collectionReportTarget = {
  onDAVQueryComplete: function(status, result, headers, data) {
         var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
                                .createInstance(Components.interfaces.nsIDOMParser);
-        data.treeView.parseFolders(data.user, parser.parseFromString(result, "text/xml"));
+        var xmlResult = null;
+
+        var contentType = headers["content-type"][0];
+        if ((contentType.indexOf("text/xml") > -1
+             || contentType.indexOf("application/xml") > -1)
+            && parseInt(headers["content-length"][0]) > 0) {
+            xmlResult = parser.parseFromString(result, "text/xml");
+        }
+        data.treeView.parseFolders(data.user, xmlResult);
         var tree = document.getElementById("subscriptionTree");
         tree.view = data.treeView;
         tree.treeView = data.treeView;
@@ -167,6 +200,9 @@ var collectionReportTarget = {
 };
 
 function onStartSearch() {
+    var throbber = document.getElementById("navigator-throbber");
+    throbber.setAttribute("busy", "true");
+
     var searchInput = document.getElementById("searchInput");
 
     var query = ("<user-query"
@@ -607,18 +643,15 @@ SubscriptionTreeView.prototype = {
  toggleOpenState: function(rowIndex) {
         this.tree.beginUpdateBatch();
 
-        dump("toggle: " + rowIndex + "\n");
         var i = 0;
         for (var userCount = 0;
              i <= rowIndex && userCount < this.data.length;
              userCount++) {
             var userData = this.data[userCount];
             var toggled = false;
-            // FIXME: add code to load folder list...
             if (rowIndex == i) {
                 userData.nodeOpen = !userData.nodeOpen;
                 toggled = true;
-                dump("toggled: " + userCount + " -> " + userData.nodeOpen + "\n");
 
                 if (!(userData.hasFolders || userData.hasNoFolders)) {
                     var principalArray = sogoBaseURL().split("/");
