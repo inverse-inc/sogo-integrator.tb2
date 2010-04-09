@@ -170,7 +170,7 @@ function restartIfPossible() {
     if (this.downloadsDone && this.configurationDone && this.uninstallDone) {
         if (errorsHappened) {
             if (window.opener)
-                window.opener.checkSystemFolders();
+                window.opener.deferredCheckFolders();
             window.close();
         }
         else {
@@ -232,7 +232,7 @@ function updateDialogOnLoad () {
     catch(e) {
         dump("updateDialogOnLoad: " + e + "\n");
         if (window.opener)
-            window.opener.checkSystemFolders();
+            window.opener.deferredCheckFolders();
         window.close();
     }
 }

@@ -6,6 +6,8 @@ locale  sogo-integrator en-US chrome/locale/en-US/sogo-integrator/
 locale  sogo-integrator fr-FR chrome/locale/fr-FR/sogo-integrator/
 locale  sogo-integrator de-DE chrome/locale/de-DE/sogo-integrator/
 locale	sogo-integrator it-IT chrome/locale/it-IT/sogo-integrator/
+locale	sogo-integrator es-ES chrome/locale/es-ES/sogo-integrator/
+locale	sogo-integrator ca chrome/locale/ca/sogo-integrator/
 
 overlay chrome://global/content/commonDialog.xul chrome://sogo-integrator/content/global/common-dialog-overlay.xul
 

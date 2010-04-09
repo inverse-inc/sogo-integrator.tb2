@@ -25,8 +25,7 @@ CalendarHandler.prototype = {
   getExistingDirectories: function getExistingDirectories() {
     var existing = {};
 
-    var count = {};
-    var cals = this.mgr.getCalendars(count);
+    var cals = this.mgr.getCalendars({});
     for (var i = 0; i < cals.length; i++) {
       if (cals[i].type == "caldav") {
 				if (existing[cals[i].uri.spec])

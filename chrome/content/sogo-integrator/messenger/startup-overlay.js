@@ -28,7 +28,8 @@ function checkExtensionsUpdate() {
                           "Extensions", "status=yes", results);
     } else {
         dump("  no available update for handled extensions\n");
-        checkSystemFolders();
+        jsInclude(["chrome://sogo-integrator/content/messenger/folders-update.js"]);
+        checkFolders();
     }
 }
 
@@ -333,15 +334,9 @@ function checkExtensionVersion(currentVersion, minVersion, strict) {
     return acceptable;
 }
 
-function _checkSystemFolders() {
+function deferredCheckFolders() {
     jsInclude(["chrome://sogo-integrator/content/messenger/folders-update.js"]);
-
-    checkFolders();
-    dump("startup done\n");
-}
-
-function checkSystemFolders() {
-    window.setTimeout(_checkSystemFolders, 100);
+    window.setTimeout(checkFolders, 100);
 }
 
 // forced prefs

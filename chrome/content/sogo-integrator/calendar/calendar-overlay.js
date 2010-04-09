@@ -153,4 +153,29 @@ function toggleShowOnlyCalendar() {
 	}
 }
 
+function toggleShowOnlyCalendarByCal(cal) {
+	var composite = getCompositeCalendar();
+	for (var i = 0; i < calendarListTreeView.rowCount; i++) {
+		var calendar = calendarListTreeView.getCalendar(i);
+		if (calendar.uri != cal.uri) {
+			composite.removeCalendar(calendar.uri);
+		}
+
+		calendarListTreeView.treebox.invalidateRow(i);
+	}
+
+	composite.addCalendar(cal);
+}
+
+calendarListTreeView.onClick = function cLTV_onClick(event) {
+	if (event.button == 0) {
+		var col = {};
+		var calendar = this.getCalendarFromEvent(event, col);
+		if (col.value && col.value.id == "calendar-list-tree-checkbox"
+				&& event.shiftKey) {
+			toggleShowOnlyCalendarByCal(calendar);
+		}
+	}
+}
+
 window.creationGetHandler = subscriptionGetHandler;

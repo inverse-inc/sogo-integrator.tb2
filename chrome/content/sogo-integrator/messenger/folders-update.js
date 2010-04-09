@@ -298,6 +298,8 @@ function checkFolders() {
                       .getService(Components.interfaces.nsIConsoleService);
         console.logStringMessage("You must use at least SOGo Connector 0.9 and Mozilla Lightning 0.9 with this version of SOGo Connector.");
     }
+
+    dump("startup done\n");
 }
 
 function hideLightningWidgets(hide) {
@@ -311,8 +313,10 @@ function hideLightningWidgets(hide) {
                 widget.removeAttribute("persist");
                 widget.removeAttribute("command");
                 widget.removeAttribute("name");
+                widget.setAttribute("collapsed", hide);
+            } else if (!widget.getAttribute("persist")) {
+                widget.setAttribute("collapsed", hide);
             }
-            widget.setAttribute("collapsed", hide);
         }
         else
             dump("widget not found '" + name + "'\n");

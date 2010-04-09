@@ -1,3 +1,21 @@
+2019-04-09  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+	* Added Catalan and es-ES translation - see
+	http://www.scalableogo.org/bugs/view.php?id=448
+	for details.
+
+2010-04-07  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/calendar-overlay.js
+	(calendarListTreeView.onClick): new additional method, designed to
+	catch shift+click on the checkboxes of the calendar list.
+	(toggleShowOnlyCalendarByCal): new method based on
+	toggleShowOnlyCalendar, taking a calendar as parameter.
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js: when
+	widgets are "unhidden", shown them if their persist state is not
+	available.
+
 2010-04-02  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/messenger/startup-overlay.js
