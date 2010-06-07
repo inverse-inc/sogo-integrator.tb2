@@ -69,7 +69,8 @@ directoryChecker.prototype = {
     },
  start: function start() {
         var propfind = new sogoWebDAV(this.baseURL + this.type, this);
-        var baseProperties = ["DAV: owner", "DAV: displayname"];
+        var baseProperties = ["DAV: owner", "DAV: resourcetype",
+                              "DAV: displayname"];
         var properties;
         if (this.handler.additionalDAVProperties) {
             this.additionalProperties = this.handler.additionalDAVProperties();
@@ -126,6 +127,18 @@ directoryChecker.prototype = {
 
         return fixedURL;
     },
+ _isCollection: function _isCollection(resourcetype) {
+    var isCollection = false;
+    if (resourcetype) {
+        for (var k in resourcetype) {
+            if (k == "collection") {
+                isCollection = true;
+            }
+        }
+    }
+
+    return isCollection;
+ },
  foldersFromResponse: function foldersFromResponse(jsonResponse) {
         var folders = {};
         var username = sogoUserName();
@@ -139,27 +152,29 @@ directoryChecker.prototype = {
                     var urlArray = url.split("/");
                     if (urlArray[urlArray.length-3] == this.type) {
                         var prop = propstats[j]["prop"][0];
-                        var owner = this._fixedOwner("" + prop["owner"][0]["href"][0]);
-                        var additionalProps = [];
+                        if (this._isCollection(prop["resourcetype"][0])) {
+                            var owner = this._fixedOwner("" + prop["owner"][0]["href"][0]);
+                            var additionalProps = [];
 
-                        if (this.additionalProperties) {
-                            for (var k = 0; k < this.additionalProperties.length; k++) {
-                                var pName = this.additionalProperties[k].split(" ")[1];
+                            if (this.additionalProperties) {
+                                for (var k = 0; k < this.additionalProperties.length; k++) {
+                                    var pName = this.additionalProperties[k].split(" ")[1];
 
-                                var newValue;
-                                if (prop[pName])
-                                    newValue = xmlUnescape(prop[pName][0]);
-                                else
-                                    newValue = null;
-
-                                additionalProps.push(newValue);
+                                    var newValue;
+                                    if (prop[pName])
+                                        newValue = xmlUnescape(prop[pName][0]);
+                                    else
+                                        newValue = null;
+                                    
+                                    additionalProps.push(newValue);
+                                }
                             }
+                            var newEntry = {owner: owner,
+                                            displayName: xmlUnescape(prop["displayname"][0]),
+                                            url: url,
+                                            additional: additionalProps};
+                            folders[url] = newEntry;
                         }
-                        var newEntry = {owner: owner,
-                                        displayName: xmlUnescape(prop["displayname"][0]),
-                                        url: url,
-                                        additional: additionalProps};
-                        folders[url] = newEntry;
                     }
                 }
             }
@@ -169,18 +184,22 @@ directoryChecker.prototype = {
     },
  onDAVQueryComplete: function onDAVQueryComplete(status, response) {
         // dump("status: " + status + "\n");
-        if (status > 199 && status < 400) {
+        if (status > 199 && status < 400) {            
             var existing
             = this.fixedExisting(this.handler.getExistingDirectories());
             this.handler.removeDoubles();
-            var folders = this.foldersFromResponse(response);
-            var comparison = this.compareDirectories(existing, folders);
-            if (comparison['removed'].length)
-                this.handler.removeDirectories(comparison['removed']);
-            if (comparison['renamed'].length)
-                this.handler.renameDirectories(comparison['renamed']);
-            if (comparison['added'].length)
-                this.handler.addDirectories(comparison['added']);
+            if (response) {
+                var folders = this.foldersFromResponse(response);
+                var comparison = this.compareDirectories(existing, folders);
+                if (comparison['removed'].length)
+                    this.handler.removeDirectories(comparison['removed']);
+                if (comparison['renamed'].length)
+                    this.handler.renameDirectories(comparison['renamed']);
+                if (comparison['added'].length)
+                    this.handler.addDirectories(comparison['added']);
+            }
+            else
+                dump("an empty response was returned, we therefore do nothing\n");
         }
         else
             dump("the status code (" + status + ") was not acceptable, we therefore do nothing\n");
@@ -284,7 +303,7 @@ function checkFolders() {
                     else {
                         handler.removeHomeCalendar();
                         CalendarChecker.start();
-                        hideLightningWidgets("false");
+                        // hideLightningWidgets("false");
                     }
                 }
             }
@@ -294,6 +313,8 @@ function checkFolders() {
                       .getService(Components.interfaces.nsIConsoleService);
         console.logStringMessage("You must use at least SOGo Connector 0.9 and Mozilla Lightning 0.9 with this version of SOGo Connector.");
     }
+
+    dump("startup done\n");
 }
 
 function hideLightningWidgets(hide) {
@@ -307,8 +328,10 @@ function hideLightningWidgets(hide) {
                 widget.removeAttribute("persist");
                 widget.removeAttribute("command");
                 widget.removeAttribute("name");
+                widget.setAttribute("collapsed", hide);
+            } else if (!widget.getAttribute("persist")) {
+                widget.setAttribute("collapsed", hide);
             }
-            widget.setAttribute("collapsed", hide);
         }
         else
             dump("widget not found '" + name + "'\n");

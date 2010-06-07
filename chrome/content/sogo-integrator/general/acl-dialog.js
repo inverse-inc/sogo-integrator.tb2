@@ -23,16 +23,9 @@ var folderData = {
 };
 
 function openRolesWindowForUser(userID) {
-	var userName = "";
-	var isDefault = (userID == folderData.defaultUserID);
-	if (!isDefault) {
-		var listItem = document.getElementById("item-" + userID);
-		userName = listItem.label;
-	}
+	var listItem = document.getElementById("item-" + userID);
 	openDialog(folderData.rolesDialogURL, "roles", "dialog,titlebar,modal",
-						 {user: userID, userName: userName,
-								 isDefault: isDefault,
-								 folderURL: folderData.url});
+						 {user: userID, userName: listItem.label, folderURL: folderData.url});
 }
 
 function openRolesWindowForUserNode(node) {
@@ -46,11 +39,6 @@ function editSelectedEntry() {
 	var userList = document.getElementById("userList");
 	if (userList.selectedItem)
 		openRolesWindowForUserNode(userList.selectedItem);
-}
-
-function editDefaultEntry() {
-	if (folderData.defaultUserID)
-		openRolesWindowForUser(folderData.defaultUserID);
 }
 
 function addEntry() {
@@ -75,11 +63,16 @@ var aclQueryHandler = {
 				var result = xmlResult.firstChild;
 				for (var i = 0; i < result.childNodes.length; i++)
 					_parseResultNode(result.childNodes[i]);
-			
+
+				var strings = document.getElementById("acl-dialog-strings");
 				if (folderData.defaultUserID) {
-					var defaultRolesBtn = document.getElementById("defaultRolesBtn");
-					defaultRolesBtn.collapsed = false;
+					var defaultUser = { "id": folderData.defaultUserID,
+															"displayName": strings.getString("Any Authenticated User") };
+					_appendUserInList(defaultUser, "any-user");
 				}
+				var publicUser = { "id": "anonymous",
+													"displayName": strings.getString("Public Access") };
+				_appendUserInList(publicUser, "anonymous-user");
 			}
 			else if (data.rqType == "add-user") {
 				_appendUserInList(data.node);
@@ -146,13 +139,15 @@ function _parseResultNode(node) {
 // 			dump("value: " + value + "\n");
 			user[key] = value;
 		}
-		_appendUserInList(user);
+		if (user["id"] != "anonymous") {
+			_appendUserInList(user);
+		}
 	}
 	else
 		dump("unknown tag '" + node.tagName + "\n");
 }
 
-function _appendUserInList(user) {
+function _createUserListItem(user) {
 	var display = user.displayName;
 	if (display) {
 		var email = user.email;
@@ -166,12 +161,19 @@ function _appendUserInList(user) {
 	listItem.setAttribute("label", display);
 	listItem.setAttribute("id", "item-" + user.id);
 	listItem.setAttribute("class", "listitem-iconic");
-	listItem.setAttribute("image",
-												"chrome://messenger/skin/addressbook/icons/abcard.png");
 	listItem.addEventListener("dblclick", onItemDblClick, false);
 
+	return listItem;
+}
+
+function _appendUserInList(user, userClass) {
+	if (!userClass) {
+		userClass = "normal-user";
+	}
+	var userItem = _createUserListItem(user);
+	userItem.className += " " + userClass;
 	var list = document.getElementById("userList");
-	list.appendChild(listItem);
+	list.appendChild(userItem);
 
 	return true;
 }

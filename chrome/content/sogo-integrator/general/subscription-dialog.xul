@@ -19,6 +19,7 @@
 <?xml-stylesheet type="text/css" href="chrome://global/skin/tree.css"?>
 <?xml-stylesheet type="text/css" href="chrome://messenger/skin/searchBox.css"?>
 <?xml-stylesheet type="text/css" href="chrome://messenger/content/messenger.css"?>
+<?xml-stylesheet type="text/css" href="chrome://messenger/skin/messenger.css"?>
 
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   id="inverseSubscriptionDialog"
@@ -41,6 +42,7 @@
           </menupopup>
         </button>
       </textbox>
+      <button id="navigator-throbber" busy="false" disabled="true"/>
     </hbox>
     <tree flex="1" searching="clean" id="subscriptionTree" seltype="single" hidecolumnpicker="true">
       <treecols>
@@ -48,6 +50,9 @@
       </treecols>
       <treechildren/>
     </tree>
-    <button id="addButton" label="&subscription.button.add.label;"/>
+    <hbox>
+      <spacer flex="1"/>
+      <button align="right" id="addButton" label="&subscription.button.add.label;"/>
+    </hbox>
   </vbox>
 </dialog>
