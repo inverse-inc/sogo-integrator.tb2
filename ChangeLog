@@ -1,3 +1,73 @@
+2019-04-09  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+	* Added Catalan and es-ES translation - see
+	http://www.scalableogo.org/bugs/view.php?id=448
+	for details.
+
+2010-04-07  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/calendar-overlay.js
+	(calendarListTreeView.onClick): new additional method, designed to
+	catch shift+click on the checkboxes of the calendar list.
+	(toggleShowOnlyCalendarByCal): new method based on
+	toggleShowOnlyCalendar, taking a calendar as parameter.
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js: when
+	widgets are "unhidden", shown them if their persist state is not
+	available.
+
+2010-04-02  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/messenger/startup-overlay.js
+	(checkExtensionsUpdate): new method that check for extensions
+	update and open the update dialog only if an update is found.
+
+2010-03-25  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/subscription-dialog.js
+	(onSubscriptionDialog): the "focus" event must be listened from
+	the searchInput's inputField subelement in order to get caught.
+	This would prevent tabfocus from cleaning the input.
+	(onSearchInputKeyPress): we need to clean gSearchTimer when a
+	search is launched by pressing "enter/return".
+	(userReportTarget.onDAVQueryComplete)
+	(collectionReportTarget.onDAVQueryComplete): we check the
+	content-type of the result as well as its length prior to parse it
+	as an XML document, to avoid exceptions.
+	(userReportTarget.onDAVQueryComplete): a new element attribute
+	("searching") is set to "notfound" when the query returned no
+	result, enabling the setting of visual elements.
+	(onStartSearch): we let the "throbber" spin when a search is
+	performed.
+
+2010-03-23  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/calendar-overlay.js
+	(toggleShowOnlyCalendar): remove all calendars prior to adding the
+	missing one in order to gain a slight performance increase in the
+	rendering of the calendar view.
+
+2010-03-19  Ludovic Marcotte  <lmarcotte@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/folder-handler.js
+	We now automatically activate alarms when first adding
+	calendars on calendars that we own.
+
+2010-03-15  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/subscription-dialog.js:
+	"info" field can have multiple lines, which are then splitted and
+	reassembled with a "; " separator.
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js:
+	check that "response" is non-null before processing, for sanity.
+
+2010-03-10  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/properties-overlay.js
+	(onLoadOverlay): we no longer disable the name field as we now
+	permit the "renaming" of subscribed resources.
+
 2009-12-23  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/messenger/folders-update.js

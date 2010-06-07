@@ -1,0 +1,8 @@
+<!ENTITY addressbook-overlay.acl-menu.label "Delen...">
+
+<!ENTITY addressbook-overlay.susbcription.tooltips.add
+ "Nieuw adresboek...">
+<!ENTITY addressbook-overlay.susbcription.tooltips.subscribe
+ "Abonneren op een adresboek...">
+<!ENTITY addressbook-overlay.susbcription.tooltips.remove
+ "Verwijder het geselecteerde adresboek">

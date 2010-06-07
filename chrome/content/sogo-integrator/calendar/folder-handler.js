@@ -25,8 +25,7 @@ CalendarHandler.prototype = {
   getExistingDirectories: function getExistingDirectories() {
     var existing = {};
 
-    var count = {};
-    var cals = this.mgr.getCalendars(count);
+    var cals = this.mgr.getCalendars({});
     for (var i = 0; i < cals.length; i++) {
       if (cals[i].type == "caldav") {
 				if (existing[cals[i].uri.spec])
@@ -82,8 +81,17 @@ CalendarHandler.prototype = {
 		}
 		else if (this.mgr.setCalendarPref_) { /* Lightning 0.8, 0.9 */
 			directory.name = displayName;
-			if (isNew)
-				directory.setProperty("suppressAlarms", true);
+			if (isNew) {
+          var urlArray = directory.uri.spec.split("/");
+          var urlFolder = urlArray[7];
+
+          // We enable alarms ONLY for "folder" owners.
+          // All subscribtions's alarms are ignored by default.
+          if (directory.uri.spec.indexOf('_') > -1)
+              directory.setProperty("suppressAlarms", true);
+          else
+              directory.setProperty("suppressAlarms", false);
+      }
 			directory.setProperty("cache.enabled", true);
 			if (color)
 				directory.setProperty("color", color);
