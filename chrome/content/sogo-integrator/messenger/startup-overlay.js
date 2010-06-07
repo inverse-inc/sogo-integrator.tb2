@@ -15,179 +15,9 @@ function jsInclude(files, target) {
 
 var forcedPrefs = {};
 
-var iCc = Components.classes;
-var iCi = Components.interfaces;
-var thunderbirdUID = "{3550f703-e582-4d05-9a08-453d09bdfdc6}";
-
-function checkExtensionsUpdate() {
-    var extensions = getHandledExtensions();
-    dump("number of handled extensions: " + extensions.length + "\n");
-    var results = prepareRequiredExtensions(extensions);
-    if (results["urls"].length + results["uninstall"].length > 0) {
-        window.openDialog("chrome://sogo-integrator/content/messenger/update-dialog.xul",
-                          "Extensions", "status=yes", results);
-    } else {
-        dump("  no available update for handled extensions\n");
-        jsInclude(["chrome://sogo-integrator/content/messenger/folders-update.js"]);
-        checkFolders();
-    }
-}
-
-function getHandledExtensions() {
-    var handledExtensions = [];
-
-    var rdf = iCc["@mozilla.org/rdf/rdf-service;1"].getService(iCi.nsIRDFService);
-    var extensions = rdf.GetResource("http://inverse.ca/sogo-integrator/extensions");
-    var updateURL = rdf.GetResource("http://inverse.ca/sogo-integrator/updateURL");
-    var extensionId = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#id");
-    var extensionName = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#name");
-
-    var ds = rdf.GetDataSourceBlocking("chrome://sogo-integrator/content/extensions.rdf");
-
-    try {
-        var urlNode = ds.GetTarget(extensions, updateURL, true);
-        if (urlNode instanceof iCi.nsIRDFLiteral)
-            handledExtensions.updateRDF = urlNode.Value;
-
-        var targets = ds.ArcLabelsOut(extensions);
-        while (targets.hasMoreElements()) {
-            var predicate = targets.getNext();
-            if (predicate instanceof iCi.nsIRDFResource) {
-                var target = ds.GetTarget(extensions, predicate, true);
-                if (target instanceof iCi.nsIRDFResource) {
-                    var extension = new Object();
-                    var id = ds.GetTarget(target, extensionId, true);
-                    if (id instanceof iCi.nsIRDFLiteral)
-                        extension.id = id.Value;
-                    var name = ds.GetTarget(target, extensionName, true);
-                    if (name instanceof iCi.nsIRDFLiteral) {
-                        extension.name = name.Value;
-                        // 						dump("name: " + extension.name + "\n");
-                    }
-                    if (extension.id)
-                        handledExtensions.push(extension);
-                }
-            }
-        }
-    }
-    catch(e) {}
-
-    return handledExtensions;
-}
-
-function prepareRequiredExtensions(extensions) {
-    var extensionsURL = new Array();
-    var unconfiguredExtensions = new Array();
-    var uninstallExtensions = new Array();
-
-    var gExtensionManager = iCc["@mozilla.org/extensions/manager;1"]
-                            .getService(iCi.nsIExtensionManager);
-    var preferences = Components.classes["@mozilla.org/preferences;1"]
-                      .getService(Components.interfaces.nsIPref);
-    var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
-                  .getService(Components.interfaces.nsIXULRuntime);
-
-    var rdf = iCc["@mozilla.org/rdf/rdf-service;1"]
-              .getService(iCi.nsIRDFService);
-
-    for (var i = 0; i < extensions.length; i++) {
-        var extensionItem = gExtensionManager.getItemForID(extensions[i].id);
-        var extensionRDFURL = extensions.updateRDF
-                              .replace("%ITEM_ID%", escape(extensions[i].id), "g")
-                              .replace("%ITEM_VERSION%", "0.00", "g")
-                              .replace("%PLATFORM%", escape(appInfo.OS + "_" + appInfo.XPCOMABI), "g");
-        var extensionURN = rdf.GetResource("urn:mozilla:extension:"
-                                           + extensions[i].id);
-        var extensionData = getExtensionData(rdf,
-                                             extensionRDFURL, extensionURN);
-        if (extensionData) {
-            // We check if we have to disable some extension that _is installed_
-            // If so, let's do it right away
-            if (extensionItem.name.length > 0
-                && extensionData.version == "disabled") {
-                uninstallExtensions.push(extensions[i].id);
-            }
-            else if ((!extensionItem.name
-                      || extensionData.version != extensionItem.version)
-                     && extensionData.version != "disabled") {
-                extensionsURL.push({name: extensions[i].name,
-                            url: extensionData.url});
-            }
-            else {
-                var configured = false;
-                try {
-                    configured = preferences.GetBoolPref("inverse-sogo-integrator.extensions." + extensions[i].id + ".isconfigured");
-                }
-                catch(e) {}
-                if (!configured)
-                    unconfiguredExtensions.push(extensions[i].id);
-            }
-        }
-        else
-            dump("no data returned for '" + extensions[i].id + "'\n");
-    }
-
-    return {urls: extensionsURL,
-            configuration: unconfiguredExtensions,
-            uninstall: uninstallExtensions};
-}
-
-function getExtensionData(rdf, extensionRDFURL, extensionURN) {
-    var extensionData = null;
-
-    var updates = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#updates");
-
-    try {
-        // dump("url: " + extensionRDFURL + "\n");
-        var ds = rdf.GetDataSourceBlocking(extensionRDFURL);
-        var urlNode = ds.GetTarget(extensionURN, updates, true);
-        if (urlNode instanceof iCi.nsIRDFResource) {
-            var targets = ds.ArcLabelsOut(urlNode);
-            while (targets.hasMoreElements()) {
-                var node = targets.getNext();
-                if (node instanceof iCi.nsIRDFResource) {
-                    var nodeValue = ds.GetTarget(urlNode, node, true);
-                    if (nodeValue instanceof iCi.nsIRDFResource)
-                        extensionData = GetRDFUpdateData(rdf, ds, nodeValue);
-                }
-            }
-        }
-    }
-    catch (e) {
-        dump("getExtensionData: " + e + "\n");
-    }
-
-    return extensionData;
-}
-
-function GetRDFUpdateData(rdf, ds, node) {
-    // 	dump("getrdfupdatedata...\n");
-    var updateData = { url: null, version: null };
-
-    var extensionVersion = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#version");
-    var targetApplication = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#targetApplication");
-    var applicationId = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#id");
-    var updateLink = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#updateLink");
-
-    var version = ds.GetTarget(node, extensionVersion, true);
-    if (version instanceof iCi.nsIRDFLiteral) {
-        updateData.version = version.Value;
-        var appNode = ds.GetTarget(node, targetApplication, true);
-        if (appNode) {
-            var appId = ds.GetTarget(appNode, applicationId, true);
-            if (appId instanceof iCi.nsIRDFLiteral
-                && appId.Value == thunderbirdUID) {
-                var updateLink = ds.GetTarget(appNode, updateLink, true);
-                if (updateLink instanceof iCi.nsIRDFLiteral)
-                    updateData.url = updateLink.Value;
-            }
-        }
-    }
-
-    if (!(updateData.url && updateData.version))
-        updateData = null;
-
-    return updateData;
+function openUpdateDialog() {
+    window.openDialog("chrome://sogo-integrator/content/messenger/update-dialog.xul",
+                      "Extensions", "status=yes");
 }
 
 function sogoIntegratorStartupOverlayOnLoad() {
@@ -221,8 +51,7 @@ function sogoIntegratorStartupOverlayOnLoad() {
 
     if (typeof(getCompositeCalendar) == "undefined"
         || !_setupCalStartupObserver()) {
-        dump("no calendar available: checking extensions update right now.\n");
-        checkExtensionsUpdate();
+        openUpdateDialog();
     }
 }
 
@@ -243,7 +72,7 @@ function _setupCalStartupObserver() {
       }
   }
 
-	dump("extensions/folder update starts after: " + calDavCount + " cals\n");
+	dump("need to start after: " + calDavCount + " cals\n");
 
 	if (calDavCount > 0) {
 // composite observer
@@ -254,9 +83,10 @@ function _setupCalStartupObserver() {
               this.counter++;
               dump("counter: " + this.counter + "\n");
               if (this.counter >= this.maxCount) {
+                  dump("removing observer\n");
                   compCalendar.removeObserver(this);
-                  dump("calendars loaded, now checking extensions\n");
-                  checkExtensionsUpdate();
+                  dump("update dialog from observer\n");
+                  openUpdateDialog();
               }
           },
       onStartBatch: function(calendar) {},
@@ -334,9 +164,15 @@ function checkExtensionVersion(currentVersion, minVersion, strict) {
     return acceptable;
 }
 
-function deferredCheckFolders() {
+function _checkSystemFolders() {
     jsInclude(["chrome://sogo-integrator/content/messenger/folders-update.js"]);
-    window.setTimeout(checkFolders, 100);
+
+    checkFolders();
+    dump("startup done\n");
+}
+
+function checkSystemFolders() {
+    window.setTimeout(_checkSystemFolders, 100);
 }
 
 // forced prefs

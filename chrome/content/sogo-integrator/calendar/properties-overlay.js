@@ -21,6 +21,7 @@ window.addEventListener("load", onLoadOverlay, false);
 var folderURL = "";
 var originalName = "";
 var originalColor = "";
+var isOwner = false;
 
 function onLoadOverlay() {
 	if (window.arguments && window.arguments[0]) {
@@ -30,6 +31,15 @@ function onLoadOverlay() {
 		originalColor = document.getElementById("calendar-color").color;
 
 		if (folderURL.indexOf(sogoBaseURL()) > -1) {
+			var mgr = Components.classes["@inverse.ca/calendar/caldav-acl-manager;1"]
+				.getService(Components.interfaces.nsISupports)
+				.wrappedJSObject;
+			var uri = Components.classes["@mozilla.org/network/standard-url;1"].getService(Components.interfaces.nsIURL);
+			uri.spec = folderURL;
+			var entry = mgr.calendarEntry(uri);
+			isOwner = entry.userIsOwner();
+			calendarName.disabled = !isOwner;
+
 			var rows = ["calendar-readOnly-row", "calendar-cache-row"];
 			for each (var row in rows) {
 					document.getElementById(row).setAttribute("collapsed", "true");
@@ -47,7 +57,7 @@ function onOverlayAccept() {
 
 	if (newFolderURL.indexOf(sogoBaseURL()) > -1
 			&& newFolderURL == folderURL) {
-		var changeName = (newName != originalName);
+		var changeName = (isOwner && newName != originalName);
 		var changeColor = (newColor != originalColor);
 		if (changeName || changeColor) {
 			var proppatch = new sogoWebDAV(newFolderURL, this);
@@ -73,7 +83,9 @@ function onOverlayAccept() {
 }
 
 function onDAVQueryComplete(status, result) {
-	// dump("folderURL: " + folderURL + "\n");
+	var correct = false;
+
+	dump("folderURL: " + folderURL + "\n");
 
 	if (status == 207) {
 // 		for (var k in result) {

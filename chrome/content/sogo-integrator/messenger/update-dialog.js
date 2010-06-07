@@ -1,11 +1,27 @@
 /* -*- Mode: java; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
+var consoleSvc = Components.classes["@mozilla.org/consoleservice;1"]
+                 .getService(Components.interfaces.nsIConsoleService);
+
+function logString(string) {
+    if (string[string.length-1] != "\n")
+        string += "\n";
+    dump(string);
+    if (consoleSvc)
+        consoleSvc.logStringMessage(string);
+    // 	var logArea = document.getElementById("logArea");
+    // 	if (logArea)
+    // 		logArea.value = logArea.value + string;
+}
+
 var iCc = Components.classes;
 var iCi = Components.interfaces;
+var thunderbirdUID = "{3550f703-e582-4d05-9a08-453d09bdfdc6}";
 var shouldRestart = false;
 var errorsHappened = false;
 
 function inverseUpdateListener() {
+    return this;
 }
 
 inverseUpdateListener.prototype = {
@@ -19,29 +35,29 @@ inverseUpdateListener.prototype = {
         return this;
     },
  onAddonUpdateEnded: function(addon, status) {
-        dump("addon: " + addon.id + "; status: " + status + "\n");
+        logString("addon: " + addon.id + "; status: " + status + "\n");
     },
  onAddonUpdateStarted: function(addon) {
-        dump("addonupdatestarted\n");
+        logString("addonupdatestarted\n");
     },
  onUpdateEnded: function() {
-        dump("updateended\n");
+        logString("updateended\n");
     },
  onUpdateStarted: function() {
-        dump("updatestarted\n");
+        logString("updatestarted\n");
     },
  onStateChange: function(addon, state, value) {
-        dump("onstatechange: " + state + "\n");
+        logString("onstatechange: " + state + "\n");
     },
  onProgress: function (addon, value, maxValue) {
-        dump("onprogress: " + value + "\n");
+        logString("onprogress: " + value + "\n");
     }
 };
 
 function configureCurrentExtensions(cfExtensions) {
     if (cfExtensions.length > 0) {
         for (var i = 0; i < cfExtensions.length; i++)
-            dump("configuring extension (fake): " + cfExtensions[i] + "\n");
+            logString("configuring extension (fake): " + cfExtensions[i]);
     }
     this.configurationDone = true;
     this.restartIfPossible();
@@ -51,10 +67,10 @@ function uninstallCurrentExtensions(cfExtensions) {
     var gExtensionManager = iCc["@mozilla.org/extensions/manager;1"]
                             .getService().QueryInterface(iCi.nsIExtensionManager);
 	
-    dump("About to remove " + cfExtensions.length + " extensions\n");
+    logString("About to remove " + cfExtensions.length + " extensions");
     if (cfExtensions.length > 0) {
         for (var i = 0; i < cfExtensions.length; i++) {
-            dump("Removing existing extension: " + cfExtensions[i] + "\n");
+            logString("Removing existing extension: " + cfExtensions[i]);
             gExtensionManager.uninstallItem(cfExtensions[i]);
         }
     }
@@ -69,23 +85,121 @@ function downloadMissingExtensions(dlExtensions) {
         //     var dlDlg
         //       = window.openDialog("chrome://mozapps/content/downloads/downloads.xul",
         // 			  "ext", "chrome,dialog,centerscreen,resizable");
-        window.extensionDownloads = [];
+        window.extensionDownloads = new Array();
         //     window.downloadDialog = dlDlg;
         for (var i = 0; i < dlExtensions.length; i++) {
-            dump("downloading " + dlExtensions[i].name + "\n");
+            logString("downloading " + dlExtensions[i].name);
             window.extensionDownloads.push(this.downloadExtension(dlExtensions[i]));
         }
-        dump("starting loop\n");
+        logString("starting loop");
         window.downloadInterval = window.setInterval(window.checkDownloadInterval, 500);
     }
     else {
         this.downloadsDone = true;
-        dump("no extension missing\n");
+        logString("no extension missing");
     }
 }
 
+function getHandledExtensions() {
+    var handledExtensions = new Array();
+
+    var rdf = iCc["@mozilla.org/rdf/rdf-service;1"].getService(iCi.nsIRDFService);
+    var extensions = rdf.GetResource("http://inverse.ca/sogo-integrator/extensions");
+    var updateURL = rdf.GetResource("http://inverse.ca/sogo-integrator/updateURL");
+    var extensionId = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#id");
+    var extensionName = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#name");
+
+    var ds = rdf.GetDataSourceBlocking("chrome://sogo-integrator/content/extensions.rdf");
+
+    try {
+        var urlNode = ds.GetTarget(extensions, updateURL, true);
+        if (urlNode instanceof iCi.nsIRDFLiteral)
+            handledExtensions.updateRDF = urlNode.Value;
+
+        var targets = ds.ArcLabelsOut(extensions);
+        while (targets.hasMoreElements()) {
+            var predicate = targets.getNext();
+            if (predicate instanceof iCi.nsIRDFResource) {
+                var target = ds.GetTarget(extensions, predicate, true);
+                if (target instanceof iCi.nsIRDFResource) {
+                    var extension = new Object();
+                    var id = ds.GetTarget(target, extensionId, true);
+                    if (id instanceof iCi.nsIRDFLiteral)
+                        extension.id = id.Value;
+                    var name = ds.GetTarget(target, extensionName, true);
+                    if (name instanceof iCi.nsIRDFLiteral) {
+                        extension.name = name.Value;
+                        // 						logString("name: " + extension.name + "\n");
+                    }
+                    if (extension.id)
+                        handledExtensions.push(extension);
+                }
+            }
+        }
+    }
+    catch(e) {}
+
+    return handledExtensions;
+}
+
+function prepareRequiredExtensions(extensions) {
+    var extensionsURL = new Array();
+    var unconfiguredExtensions = new Array();
+    var uninstallExtensions = new Array();
+
+    var gExtensionManager = iCc["@mozilla.org/extensions/manager;1"]
+                            .getService(iCi.nsIExtensionManager);
+    var preferences = Components.classes["@mozilla.org/preferences;1"]
+                      .getService(Components.interfaces.nsIPref);
+    var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+                  .getService(Components.interfaces.nsIXULRuntime);
+
+    var rdf = iCc["@mozilla.org/rdf/rdf-service;1"]
+              .getService(iCi.nsIRDFService);
+
+    for (var i = 0; i < extensions.length; i++) {
+        var extensionItem = gExtensionManager.getItemForID(extensions[i].id);
+        var extensionRDFURL = extensions.updateRDF
+                              .replace("%ITEM_ID%", escape(extensions[i].id), "g")
+                              .replace("%ITEM_VERSION%", "0.00", "g")
+                              .replace("%PLATFORM%", escape(appInfo.OS + "_" + appInfo.XPCOMABI), "g");
+        var extensionURN = rdf.GetResource("urn:mozilla:extension:"
+                                           + extensions[i].id);
+        var extensionData = this.getExtensionData(rdf, extensionRDFURL,
+                                                  extensionURN);
+        if (extensionData) {
+            // We check if we have to disable some extension that _is installed_
+            // If so, let's do it right away
+            if (extensionItem.name.length > 0
+                && extensionData.version == "disabled") {
+                uninstallExtensions.push(extensions[i].id);
+            } 
+            else if ((!extensionItem.name
+                      || extensionData.version != extensionItem.version)
+                     && extensionData.version != "disabled") {
+                extensionsURL.push({name: extensions[i].name,
+                            url: extensionData.url});
+            }
+            else {
+                var configured = false;
+                try {
+                    configured = preferences.GetBoolPref("inverse-sogo-integrator.extensions." + extensions[i].id + ".isconfigured");
+                }
+                catch(e) {}
+                if (!configured)
+                    unconfiguredExtensions.push(extensions[i].id);
+            }
+        }
+        else
+            logString("no data returned for " + extensionItem.name);
+    }
+
+    return {urls: extensionsURL, configuration: unconfiguredExtensions,
+            uninstall: uninstallExtensions};
+}
+
 function downloadExtension(dlExtension) {
-    dump("download of extension: " + dlExtension.url + "\n");
+    logString ("extension: " + dlExtension.url + "\n");
     var destURL = this.extensionDestURL(dlExtension.url);
 
     var downloadMgr = iCc['@mozilla.org/download-manager;1']
@@ -124,10 +238,11 @@ function extensionDestURL(extensionURL) {
 }
 
 function checkDownloadInterval() {
-    // dump("check\n");
+    logString("check");
 
     var downloadMgr = iCc['@mozilla.org/download-manager;1']
                       .getService(iCi.nsIDownloadManager);
+
     if (!downloadMgr.activeDownloadCount) {
         clearInterval(window.downloadInterval);
         downloadMgr.cleanUp();
@@ -135,7 +250,7 @@ function checkDownloadInterval() {
         //       window.downloadDialog.close();
 
         this.installDownloadedExtensions();
-        dump("loop ended\n");
+        logString("loop ended");
     }
 
     return true;
@@ -146,17 +261,17 @@ function installDownloadedExtensions() {
                             .getService(iCi.nsIExtensionManager);
 
     gExtensionManager.addUpdateListener(new inverseUpdateListener());
-    dump("downloads:  " + window.extensionDownloads.length + "\n");
+    logString("downloads:  " + window.extensionDownloads.length);
     if (window.extensionDownloads.length) {
         for (var i = 0; i < window.extensionDownloads.length; i++) {
-            dump("installing: " + window.extensionDownloads[i].leafName + "\n");
+            logString("installing: " + window.extensionDownloads[i].leafName);
             try {
                 gExtensionManager.installItemFromFile(window.extensionDownloads[i],
                                                       "app-profile");
             }
             catch(e) {
                 errorsHappened = true;
-                dump("installation failure\n");
+                logString("installation failure");
             }
         }
         shouldRestart = true;
@@ -170,7 +285,7 @@ function restartIfPossible() {
     if (this.downloadsDone && this.configurationDone && this.uninstallDone) {
         if (errorsHappened) {
             if (window.opener)
-                window.opener.deferredCheckFolders();
+                window.opener.checkSystemFolders();
             window.close();
         }
         else {
@@ -186,13 +301,76 @@ function restartIfPossible() {
                 for (var i = maxChild - 1; i > -1; i--)
                     message.removeChild(message.childNodes[i]);
                 message.appendChild(document.createTextNode(restartMessage.value));
+                logString("timeout.....\n");
+                if (window.setTimeout)
+                    logString("has timeout.....\n");
                 window.setTimeout(updateDialogOnReload, 3000);
+                logString("timeout set");
             }
         }
     }
 }
 
+function getExtensionData(rdf, extensionRDFURL, extensionURN) {
+    var extensionData = null;
+
+    var updates = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#updates");
+
+    try {
+        dump("url: " + extensionRDFURL + "\n");
+        var ds = rdf.GetDataSourceBlocking(extensionRDFURL);
+        var urlNode = ds.GetTarget(extensionURN, updates, true);
+        if (urlNode instanceof iCi.nsIRDFResource) {
+            var targets = ds.ArcLabelsOut(urlNode);
+            while (targets.hasMoreElements()) {
+                var node = targets.getNext();
+                if (node instanceof iCi.nsIRDFResource) {
+                    var nodeValue = ds.GetTarget(urlNode, node, true);
+                    if (nodeValue instanceof iCi.nsIRDFResource)
+                        extensionData = this.GetRDFUpdateData(rdf, ds, nodeValue);
+                }
+            }
+        }
+    }
+    catch (e) {
+        logString("getExtensionData: " + e);
+    }
+
+    return extensionData;
+}
+
+function GetRDFUpdateData(rdf, ds, node) {
+    // 	logString("getrdfupdatedata...\n");
+    var updateData = { url: null, version: null };
+
+    var extensionVersion = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#version");
+    var targetApplication = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#targetApplication");
+    var applicationId = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#id");
+    var updateLink = rdf.GetResource("http://www.mozilla.org/2004/em-rdf#updateLink");
+
+    var version = ds.GetTarget(node, extensionVersion, true);
+    if (version instanceof iCi.nsIRDFLiteral) {
+        updateData.version = version.Value;
+        var appNode = ds.GetTarget(node, targetApplication, true);
+        if (appNode) {
+            var appId = ds.GetTarget(appNode, applicationId, true);
+            if (appId instanceof iCi.nsIRDFLiteral
+                && appId.Value == thunderbirdUID) {
+                var updateLink = ds.GetTarget(appNode, updateLink, true);
+                if (updateLink instanceof iCi.nsIRDFLiteral)
+                    updateData.url = updateLink.Value;
+            }
+        }
+    }
+
+    if (!(updateData.url && updateData.version))
+        updateData = null;
+
+    return updateData;
+}
+
 function onAcceptClick() {
+    logString("onAcceptClick...\n");
     var appStartup = iCc["@mozilla.org/toolkit/app-startup;1"]
                      .getService(iCi.nsIAppStartup);
     appStartup.quit(iCi.nsIAppStartup.eRestart
@@ -202,40 +380,57 @@ function onAcceptClick() {
 }
 
 function onCancelClick() {
+    logString("onCancelClick...\n");
     return false;
 }
 
 function updateDialogOnReload() {
-    dump("Restarting...\n");
+    logString("Restarting...\n");
     var appStartup = iCc["@mozilla.org/toolkit/app-startup;1"]
                      .getService(iCi.nsIAppStartup);
     appStartup.quit(iCi.nsIAppStartup.eRestart
                     | iCi.nsIAppStartup.eForceQuit);
 }
 
-function updateDialogOnLoad () {
-    // 	dump("onRealLoad...\n");
+function updateDialogOnLoadReal () {
+    // 	logString("onRealLoad...\n");
     var dialog = document.getElementById("inverseMessengerUpdateDlg");
     var button = dialog.getButton("accept");
     button.disabled = true;
     shouldRestart = false;
 
     try {
-        this.configurationDone = false;
-        this.downloadsDone = false;
-        this.uninstallDone = false;
-        var results = window.arguments[0];
-        this.downloadMissingExtensions(results["urls"]);
-        this.configureCurrentExtensions(results["configuration"]);
-        this.uninstallCurrentExtensions(results["uninstall"]);
+        // 		logString ("starting...");
+
+        var extensions = this.getHandledExtensions();
+        logString("extensions: " + extensions.length);
+        var results = this.prepareRequiredExtensions(extensions);
+        if ((results["urls"].length + results["uninstall"].length) > 0) {
+            this.configurationDone = false;
+            this.downloadsDone = false;
+            this.uninstallDone = false;
+            this.downloadMissingExtensions(results["urls"]);
+            this.configureCurrentExtensions(results["configuration"]);
+            this.uninstallCurrentExtensions(results["uninstall"]);
+        }
+        else {
+            if (window.opener)
+                window.opener.checkSystemFolders();
+            window.close();
+        }
     }
     catch(e) {
-        dump("updateDialogOnLoad: " + e + "\n");
+        logString("updateDialogOnLoad: " + e);
         if (window.opener)
-            window.opener.deferredCheckFolders();
+            window.opener.checkSystemFolders();
         window.close();
     }
 }
 
-// dump("we will load..\n");
+function updateDialogOnLoad () {
+    // 	logString("onLoad...\n");
+    window.setTimeout(updateDialogOnLoadReal, 200);
+}
+
+// logString("we will load..\n");
 window.addEventListener("load", updateDialogOnLoad, false);

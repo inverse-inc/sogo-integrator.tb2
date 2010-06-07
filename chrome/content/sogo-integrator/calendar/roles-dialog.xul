@@ -31,8 +31,10 @@
 
   <vbox>
     <vbox id="titleContent">
-      <vbox id="userTitle">
-	<label id="titleLabel" value="&roles-dialog.user-roles.label;"/>
+      <label collapsed="true" id="defaultTitle"
+	value="&roles-dialog.default-roles.label;"/>
+      <vbox collapsed="true" id="userTitle">
+	<label value="&roles-dialog.user-roles.label;"/>
 	<label id="titleUserName" value=""/>
       </vbox>
     </vbox>
@@ -49,8 +51,8 @@
 		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
 		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
 		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
-		<menuitem id="menuOptionPublicModifier" value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
-		<menuitem id="menuOptionPublicResponder" value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
 	      </menupopup>
 	    </menulist>
 	  </hbox>
@@ -62,8 +64,8 @@
 		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
 		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
 		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
-		<menuitem id="menuOptionConfidentialModifier" value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
-		<menuitem id="menuOptionConfidentialResponder" value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
 	      </menupopup>
 	    </menulist>
 	  </hbox>
@@ -75,8 +77,8 @@
 		<menuitem value="" label="&roles-dialog.roles-choice.none.label;"/>
 		<menuitem value="Viewer" label="&roles-dialog.roles-choice.view-all.label;"/>
 		<menuitem value="DAndTViewer" label="&roles-dialog.roles-choice.view-d-a-t.label;"/>
-		<menuitem id="menuOptionPrivateModifier" value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
-		<menuitem id="menuOptionPrivateResponder" value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
+		<menuitem value="Modifier" label="&roles-dialog.roles-choice.modify.label;"/>
+		<menuitem value="Responder" label="&roles-dialog.roles-choice.respond-to.label;"/>
 	      </menupopup>
 	    </menulist>
 	  </hbox>
@@ -91,10 +93,10 @@
 	label="&roles-dialog.roles.object-eraser.label;"
 	disabled="true"
 	checked="false"/>
-      <hbox>
-	<spring flex="1"/>
+      <hbox id="entriesToolbar">
+	<spacer flex="1"/>
 	<button disabled="true" id="updateBtn" command="RolesCommandUpdate"
-          label="&roles-dialog.update-button.label;"/>
+	  label="&roles-dialog.update-button.label;"/>
 	<button id="cancelBtn" command="RolesCommandCancel"
 	  label="&roles-dialog.cancel-button.label;"/>
       </hbox>

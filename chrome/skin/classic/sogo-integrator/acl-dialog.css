@@ -51,12 +51,3 @@
 
 #entriesToolbar
 { height: 36px; }
-
-.normal-user
-{ list-style-image: url("chrome://messenger/skin/addressbook/icons/abcard.png"); }
-
-.any-user
-{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anyone.png"); }
-
-.anonymous-user
-{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anonymous.png"); }

@@ -17,19 +17,15 @@ jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 					 "chrome://inverse-library/content/sogoWebDAV.js",
 					 "chrome://inverse-library/content/uuid.js"]);
 
-function createOperation(folderURL, displayName, handler) {
+function _creationTarget(handler, folderURL, displayName, target) {
+	this.handler = handler;
 	this.folderURL = folderURL;
 	this.displayName = displayName;
-	this.handler = handler;
+	this.onDAVQueryComplete = this.onMkColQueryComplete;
+	this.target = target;
 }
 
-createOperation.prototype = {
- start: function cO_start() {
-		this.onDAVQueryComplete = this.onMkColQueryComplete;
-		var mkcol = new sogoWebDAV(this.folderURL, this);
-		mkcol.mkcol();
-	},
-
+_creationTarget.prototype = {
  onDAVQueryComplete: null,
  onMkColQueryComplete: function(status, result) {
 		if (status == 201) {
@@ -60,18 +56,20 @@ createOperation.prototype = {
 					}
 				}
 			}
+			if (this.target) {
+				this.target.onCreationDone();
+			}
 		}
 	}
 };
 
-function createFolder(displayName, handler) {
-	window.setTimeout(_realCreateFolder, 100, displayName, handler);
-}
-
-function _realCreateFolder(displayName, handler) {
+function createFolder(displayName, handler, target) {
 	var newURL = handler.urlForParentDirectory() + "/" + new UUID() + "/";
-	var creation = new createOperation(newURL, displayName, handler);
-	creation.start();
+	var mkcol = new sogoWebDAV(newURL, new _creationTarget(handler,
+																												 newURL,
+																												 displayName,
+																												 target));
+	mkcol.mkcol();
 }
 
 function deleteFolder(nodeURL, handler) {

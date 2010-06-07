@@ -1,6 +1,6 @@
 #rolesDialog
 { width: 500px;
-  height: 176px;
+  height: 200px;
   padding: 0px;
   margin: 0px; }
 
@@ -12,13 +12,10 @@
   padding-left: 2em;
   border-bottom: 1px solid #000; }
 
-#titleLabel[transparent="true"]
-{ opacity: 0; }
-
 #userTitle
 { font-size: 10pt; }
 
-#titleUserName
+#defaultTitle, #titleUserName
 { font-weight: bold;
   font-size: 12pt;  }
 
@@ -40,6 +37,9 @@
   max-height: 24px;
   -moz-image-region: rect(0px 24px 24px 0px);
   list-style-image: url("chrome://sogo-integrator/skin/remove-contact.gif"); }
+
+#entriesToolbar
+{ height: 36px; }
 
 #roleChoices
 { width: 200px; }

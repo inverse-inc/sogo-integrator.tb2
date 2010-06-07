@@ -30,21 +30,15 @@ function onLoad() {
 	userData.userName = data.userName;
 	folderURL = data.folderURL;
 
-	if (userData.userID == "anonymous") {
-		window.resizeTo(500, 156);
-		var cbRoles = [ "Creator", "Eraser", "Editor" ];
-		for each (var cbRole in cbRoles) {
-				var cbId = "roleObject" + cbRole;
-				var cb = document.getElementById(cbId);
-				cb.collapsed = true;
-		}
-
-		var titleLabel = document.getElementById("titleLabel");
-		titleLabel.setAttribute("transparent", "true");
+	var titleItem;
+	if (data.isDefault)
+		titleItem = document.getElementById("defaultTitle");
+	else {
+		titleItem = document.getElementById("userTitle");
+		var titleUserName = document.getElementById("titleUserName");
+		titleUserName.value = userData.userName;
 	}
-
-	var titleUserName = document.getElementById("titleUserName");
-	titleUserName.value = userData.userName;
+	titleItem.collapsed = false;
 
 	disableWidgets(true);
 	var reportQuery = ('<acl-query'
@@ -61,7 +55,7 @@ function onDAVQueryComplete(status, response, headers, data) {
 		if (data == "load-query") {
 			var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Components.interfaces.nsIDOMParser);
-			if (response.indexOf("<?xml") == 0) {
+			if (response.length > 0) {
 				var xmlResult = parser.parseFromString(response, "text/xml");
 				var result = xmlResult.documentElement;
 				for (var i = 0; i < result.childNodes.length; i++) {

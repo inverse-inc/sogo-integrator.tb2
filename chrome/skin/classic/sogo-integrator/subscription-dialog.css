@@ -2,9 +2,6 @@
 { width: 400px;
   height: 200px; }
 
-#searchInput[searching="notfound"]
-{ color: #f00; }
-
 tree
 { background-color: -moz-dialog !important; }
 

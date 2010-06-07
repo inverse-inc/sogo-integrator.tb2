@@ -21,9 +21,7 @@ var userData = {
 };
 
 var folderURL = null;
-var unknownRoles = [];
-
-var menuObjectClasses = [ "Public", "Confidential", "Private" ];
+var unknownRoles = new Array();
 
 function onLoad() {
 	var data = window.arguments[0];
@@ -32,30 +30,15 @@ function onLoad() {
 	userData.userName = data.userName;
 	folderURL = data.folderURL;
 
-	if (userData.userID == "anonymous") {
-		window.resizeTo(500, 186);
-		var cbRoles = [ "Creator", "Eraser" ];
-		for each (var cbRole in cbRoles) {
-				var cbId = "roleObject" + cbRole;
-				var cb = document.getElementById(cbId);
-				cb.collapsed = true;
-		}
-
-		var menuRoles = [ "Modifier", "Responder" ];
-		for each (var menuRole in menuRoles) {
-			for each (var menuClass in menuObjectClasses) {
-				var menuOptionId = "menuOption" + menuClass + menuRole;
-				var menuOption = document.getElementById(menuOptionId);
-				menuOption.collapsed = true;
-			}
-		}
-
-		var titleLabel = document.getElementById("titleLabel");
-		titleLabel.setAttribute("transparent", "true");
+	var titleItem;
+	if (data.isDefault)
+		titleItem = document.getElementById("defaultTitle");
+	else {
+		titleItem = document.getElementById("userTitle");
+		var titleUserName = document.getElementById("titleUserName");
+		titleUserName.value = userData.userName;
 	}
-
-	var titleUserName = document.getElementById("titleUserName");
-	titleUserName.value = userData.userName;
+	titleItem.collapsed = false;
 
 	disableWidgets(true);
 	var reportQuery = ('<acl-query'
@@ -72,7 +55,7 @@ function onDAVQueryComplete(status, response, headers, data) {
 		if (data == "load-query") {
 			var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Components.interfaces.nsIDOMParser);
-			if (response.indexOf("<?xml") == 0) {
+			if (response.length > 0) {
 				var xmlResult = parser.parseFromString(response, "text/xml");
 				var result = xmlResult.documentElement;
 				for (var i = 0; i < result.childNodes.length; i++)
@@ -89,11 +72,13 @@ function onDAVQueryComplete(status, response, headers, data) {
 }
 
 function _updateRoleWidget(role) {
+	var menuObjectTypes = ["Public", "Confidential", "Private"];
+	
 	var done = false;
-	for (var i = 0; i < menuObjectClasses.length && !done; i++) {
-		if (role.indexOf(menuObjectClasses[i]) == 0) {
-			var menu = document.getElementById("menu" + menuObjectClasses[i]);
-			menu.value = role.substr(menuObjectClasses[i].length);
+	for (var i = 0; i < menuObjectTypes.length && !done; i++) {
+		if (role.indexOf(menuObjectTypes[i]) == 0) {
+			var menu = document.getElementById("menu" + menuObjectTypes[i]);
+			menu.value = role.substr(menuObjectTypes[i].length);
 			done = true;
 		}
 	}
@@ -124,10 +109,11 @@ function updateCurrentUser() {
 
 	var xmlRoles = "";
 
-	for (var i = 0; i < menuObjectClasses.length; i++) {
-		var menu = document.getElementById("menu" + menuObjectClasses[i]);
+	var menuObjectTypes = ["Public", "Confidential", "Private"];
+	for (var i = 0; i < menuObjectTypes.length; i++) {
+		var menu = document.getElementById("menu" + menuObjectTypes[i]);
 		if (menu.value)
-			xmlRoles += "<" + xmlEscape(menuObjectClasses[i] + menu.value) + "/>";
+			xmlRoles += "<" + xmlEscape(menuObjectTypes[i] + menu.value) + "/>";
 	}
 
 	var checkBoxes = document.getElementsByTagName("checkbox");

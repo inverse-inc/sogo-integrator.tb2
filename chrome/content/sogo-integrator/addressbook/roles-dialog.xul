@@ -36,8 +36,8 @@
     <vbox id="titleContent">
       <label collapsed="true" id="defaultTitle"
 	value="&roles-dialog.default-roles.label;"/>
-      <vbox>
-	<label id="titleLabel" value="&roles-dialog.user-roles.label;"/>
+      <vbox collapsed="true" id="userTitle">
+	<label value="&roles-dialog.user-roles.label;"/>
 	<label id="titleUserName" value=""/>
       </vbox>
     </vbox>
