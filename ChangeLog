@@ -1,3 +1,63 @@
+2010-06-07  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/messenger/folders-update.js:
+	(directoryChecker.foldersFromResponse): we now check the returned
+	objects for the "collection" resource type. If not present, we
+	skip the entry.
+
+	* chrome/content/sogo-integrator/general/acl-dialog.js:
+	(userIDopenRolesWindowForUser): we now longer pass the "isDefault"
+	parameter.
+	(editDefaultEntry): removed obsolete method.
+
+	* chrome/content/sogo-integrator/calendar/roles-dialog.js
+	(onLoad): same as below.
+
+	* chrome/content/sogo-integrator/addressbook/roles-dialog.js
+	(onLoad): we now resize the window when the edited user is the
+	special "anonymous" user. In that case, we also remove the
+	modification rights since there is no case where we would like
+	unauthenticated modification of a calendar.
+
+2010-06-03  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/acl-dialog.js,
+	chrome/content/sogo-integrator/calendar/roles-dialog.js,
+	chrome/content/sogo-integrator/addressbook/roles-dialog.js: added
+	and modified code to handle public access rights as well as the
+	replacement of the "Default Roles" button with the new "Any
+	Authenticated User" user entry.
+
+2010-05-20  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/general/creation-utils.js:
+	(createFolder): now triggers a timeout that invokes the real
+	create operation, via the "createOperation" handler class.
+
+	* chrome/content/sogo-integrator/general/creation-overlay.js:
+	(_confirmCreation): the creation operation is now performed from
+	the opener window to avoid exceptions with lost XMLHttpRequest
+	references.
+
+	* chrome/content/sogo-integrator/calendar/folder-handler.js:
+	(CalendarHandler._setDirectoryProperties): default values for
+	"suppressAlarms", "showInTodayPane" and "showInvitations" are set
+	on new calendar folders.
+
+2010-04-12  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/calendar/calendar-overlay.js:
+	replace the "onclick" handle on the tree object, as what we really
+	want to to is intercept anything causing a calendar to be added or
+	removed outside our code. When catching the "onclick", we have no
+	way of preventing the "mousedown" that triggers the "cyclecell"
+	method from being invoked.
+
+	* chrome/content/sogo-integrator/general/subscription-dialog.js
+	(SubscriptionTreeView._parseUsersNode)
+	(UsersTreeView._parseTreeNodes:): handle the case when the
+	displayName of a returned user is empty.
+
 2019-04-09  Ludovic Marcotte  <lmarcotte@inverse.ca>
 
 	* Added Catalan and es-ES translation - see

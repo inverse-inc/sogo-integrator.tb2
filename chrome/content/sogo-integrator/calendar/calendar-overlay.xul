@@ -52,8 +52,5 @@
 	command="calendar_unsubscribe_calendar_command"
 	tooltiptext="&calendar-overlay.susbcription.tooltips.remove;"/>
     </hbox>
-
-    <tree id="calendar-list-tree-widget"
-      onclick="calendarListTreeView.onClick(event);"/>
   </modevbox>
 </overlay>

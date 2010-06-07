@@ -69,7 +69,8 @@ directoryChecker.prototype = {
     },
  start: function start() {
         var propfind = new sogoWebDAV(this.baseURL + this.type, this);
-        var baseProperties = ["DAV: owner", "DAV: displayname"];
+        var baseProperties = ["DAV: owner", "DAV: resourcetype",
+                              "DAV: displayname"];
         var properties;
         if (this.handler.additionalDAVProperties) {
             this.additionalProperties = this.handler.additionalDAVProperties();
@@ -126,6 +127,18 @@ directoryChecker.prototype = {
 
         return fixedURL;
     },
+ _isCollection: function _isCollection(resourcetype) {
+    var isCollection = false;
+    if (resourcetype) {
+        for (var k in resourcetype) {
+            if (k == "collection") {
+                isCollection = true;
+            }
+        }
+    }
+
+    return isCollection;
+ },
  foldersFromResponse: function foldersFromResponse(jsonResponse) {
         var folders = {};
         var username = sogoUserName();
@@ -139,27 +152,29 @@ directoryChecker.prototype = {
                     var urlArray = url.split("/");
                     if (urlArray[urlArray.length-3] == this.type) {
                         var prop = propstats[j]["prop"][0];
-                        var owner = this._fixedOwner("" + prop["owner"][0]["href"][0]);
-                        var additionalProps = [];
+                        if (this._isCollection(prop["resourcetype"][0])) {
+                            var owner = this._fixedOwner("" + prop["owner"][0]["href"][0]);
+                            var additionalProps = [];
 
-                        if (this.additionalProperties) {
-                            for (var k = 0; k < this.additionalProperties.length; k++) {
-                                var pName = this.additionalProperties[k].split(" ")[1];
+                            if (this.additionalProperties) {
+                                for (var k = 0; k < this.additionalProperties.length; k++) {
+                                    var pName = this.additionalProperties[k].split(" ")[1];
 
-                                var newValue;
-                                if (prop[pName])
-                                    newValue = xmlUnescape(prop[pName][0]);
-                                else
-                                    newValue = null;
-
-                                additionalProps.push(newValue);
+                                    var newValue;
+                                    if (prop[pName])
+                                        newValue = xmlUnescape(prop[pName][0]);
+                                    else
+                                        newValue = null;
+                                    
+                                    additionalProps.push(newValue);
+                                }
                             }
+                            var newEntry = {owner: owner,
+                                            displayName: xmlUnescape(prop["displayname"][0]),
+                                            url: url,
+                                            additional: additionalProps};
+                            folders[url] = newEntry;
                         }
-                        var newEntry = {owner: owner,
-                                        displayName: xmlUnescape(prop["displayname"][0]),
-                                        url: url,
-                                        additional: additionalProps};
-                        folders[url] = newEntry;
                     }
                 }
             }
@@ -288,7 +303,7 @@ function checkFolders() {
                     else {
                         handler.removeHomeCalendar();
                         CalendarChecker.start();
-                        hideLightningWidgets("false");
+                        // hideLightningWidgets("false");
                     }
                 }
             }

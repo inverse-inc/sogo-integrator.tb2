@@ -149,11 +149,7 @@ var userReportTarget = {
         var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
                                .createInstance(Components.interfaces.nsIDOMParser);
         var xmlResult = null;
-
-        var contentType = headers["content-type"][0];
-        if ((contentType.indexOf("text/xml") > -1
-             || contentType.indexOf("application/xml") > -1)
-            && parseInt(headers["content-length"][0]) > 0) {
+        if (result.indexOf("<?xml") == 0) {
             xmlResult = parser.parseFromString(result, "text/xml");
         }
 
@@ -185,11 +181,7 @@ var collectionReportTarget = {
         var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
                                .createInstance(Components.interfaces.nsIDOMParser);
         var xmlResult = null;
-
-        var contentType = headers["content-type"][0];
-        if ((contentType.indexOf("text/xml") > -1
-             || contentType.indexOf("application/xml") > -1)
-            && parseInt(headers["content-length"][0]) > 0) {
+        if (result.indexOf("<?xml") == 0) {
             xmlResult = parser.parseFromString(result, "text/xml");
         }
         data.treeView.parseFolders(data.user, xmlResult);
@@ -276,7 +268,8 @@ SubscriptionTreeView.prototype = {
             for (var j = 0; j < currentNode.childNodes.length; j++) {
                 var subnode = currentNode.childNodes[j];
                 var key = subnode.nodeName;
-                var value = subnode.firstChild.nodeValue;
+                var value = ((subnode.firstChild)
+                             ? subnode.firstChild.nodeValue : "");
                 nodeDict[key] = value;
             }
             // dump("pushing: " + nodeDict["id"] + "\n");
@@ -746,7 +739,8 @@ UsersTreeView.prototype = {
             for (var j = 0; j < currentNode.childNodes.length; j++) {
                 var subnode = currentNode.childNodes[j];
                 var key = subnode.nodeName;
-                var value = subnode.firstChild.nodeValue;
+                var value = ((subnode.firstChild)
+                             ? subnode.firstChild.nodeValue : "");
                 nodeDict[key] = value;
             }
             // dump("pushing: " + nodeDict["id"] + "\n");

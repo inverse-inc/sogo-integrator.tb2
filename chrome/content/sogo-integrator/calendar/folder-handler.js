@@ -73,31 +73,28 @@ CalendarHandler.prototype = {
 		else
 			color = null;
 
-		if (this.mgr.setCalendarPref) {
-			this.mgr.setCalendarPref(directory, "NAME", displayName);
-			this.mgr.setCalendarPref(directory, "SUPPRESSALARMS", true);
-			if (color)
-				this.mgr.setCalendarPref(directory, "COLOR", color);
-		}
-		else if (this.mgr.setCalendarPref_) { /* Lightning 0.8, 0.9 */
-			directory.name = displayName;
-			if (isNew) {
-          var urlArray = directory.uri.spec.split("/");
-          var urlFolder = urlArray[7];
+    directory.name = displayName;
+    if (isNew) {
+        var urlArray = directory.uri.spec.split("/");
+        var urlFolder = urlArray[7];
 
-          // We enable alarms ONLY for "folder" owners.
-          // All subscribtions's alarms are ignored by default.
-          if (directory.uri.spec.indexOf('_') > -1)
-              directory.setProperty("suppressAlarms", true);
-          else
-              directory.setProperty("suppressAlarms", false);
-      }
-			directory.setProperty("cache.enabled", true);
-			if (color)
+        // We enable alarms, today pane and invitations ONLY for "folder"
+        // owners.
+        // All subscribtions's alarms are ignored by default.
+        if (directory.uri.spec.indexOf('_') > -1) {
+            directory.setProperty("showInTodayPane", false);
+            directory.setProperty("showInvitations", false);
+            directory.setProperty("suppressAlarms", true);
+        }
+        else {
+            directory.setProperty("showInTodayPane", true);
+            directory.setProperty("showInvitations", true);
+            directory.setProperty("suppressAlarms", false);
+        }
+    }
+    directory.setProperty("cache.enabled", true);
+    if (color)
 				directory.setProperty("color", color);
-		}
-		else
-			throw("folder-handler.js: unsupported method for updating properties");
 	},
 	addDirectories: function addDirectories(newDirs) {
     var ioSvc = Components.classes["@mozilla.org/network/io-service;1"]
