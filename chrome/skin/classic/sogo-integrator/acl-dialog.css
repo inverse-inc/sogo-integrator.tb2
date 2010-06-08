@@ -56,7 +56,9 @@
 { list-style-image: url("chrome://messenger/skin/addressbook/icons/abcard.png"); }
 
 .any-user
-{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anyone.png"); }
+{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anyone.png");
+  font-style: italic; }
 
 .anonymous-user
-{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anonymous.png"); }
+{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anonymous.png");
+  font-style: italic; }

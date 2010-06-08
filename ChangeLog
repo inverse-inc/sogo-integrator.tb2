@@ -1,5 +1,12 @@
 2010-06-07  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
+	* chrome/content/sogo-integrator/general/acl-dialog.js
+	(_appendUserInList): order new items by keeping the special users
+	entries at the end of the list.
+	(onLoad): added code to asynchronously check if "/dav/public" is
+	available before so that we knwo whether the "anonymous" user must
+	be listed or not.
+
 	* chrome/content/sogo-integrator/messenger/folders-update.js:
 	(directoryChecker.foldersFromResponse): we now check the returned
 	objects for the "collection" resource type. If not present, we

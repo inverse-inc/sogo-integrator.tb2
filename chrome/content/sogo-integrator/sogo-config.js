@@ -30,7 +30,7 @@ function sogoHostname() {
 	baseURL = sogoBaseURL();
 	hostnameArray = baseURL.split("/");
 
-	return  hostnameArray[0] + "//" + hostnameArray[2];
+	return hostnameArray[0] + "//" + hostnameArray[2];
 }
 
 function sogoBaseURL() {

@@ -18,6 +18,7 @@ jsInclude(["chrome://sogo-integrator/content/sogo-config.js",
 
 var folderData = {
  url: null,
+ hasPublicAccess: false,
  defaultUserID: null,
  rolesDialogURL: null
 };
@@ -70,9 +71,11 @@ var aclQueryHandler = {
 															"displayName": strings.getString("Any Authenticated User") };
 					_appendUserInList(defaultUser, "any-user");
 				}
-				var publicUser = { "id": "anonymous",
-													"displayName": strings.getString("Public Access") };
-				_appendUserInList(publicUser, "anonymous-user");
+				if (folderData.hasPublicAccess) {
+					var publicUser = { "id": "anonymous",
+														 "displayName": strings.getString("Public Access") };
+					_appendUserInList(publicUser, "anonymous-user");
+				}
 			}
 			else if (data.rqType == "add-user") {
 				_appendUserInList(data.node);
@@ -90,17 +93,20 @@ function deleteEntry() {
 	var userList = document.getElementById("userList");
 	if (userList.selectedItem) {
 		var prefix = "item-";
-		var fullID = userList.selectedItem.getAttribute("id");
-		showThrobber(true);
-		var postQuery = ('<acl-query'
-										 + ' xmlns="urn:inverse:params:xml:ns:inverse-dav">'
-										 + '<remove-user user="'
-										 + fullID.substr(prefix.length) + '"/>'
-										 + '</acl-query>');
-		var post = new sogoWebDAV(folderData.url, aclQueryHandler,
-															{rqType: "remove-user",
-															 node: fullID});
-		post.post(postQuery);
+		var fullID = userList.selectedItem.id;
+		var userID = fullID.substr(prefix.length);
+		if (!(userID == "anonymous" || userID == folderData.defaultUserID)) {
+			showThrobber(true);
+			var postQuery = ('<acl-query'
+											 + ' xmlns="urn:inverse:params:xml:ns:inverse-dav">'
+											 + '<remove-user user="'
+											 + userID + '"/>'
+											 + '</acl-query>');
+			var post = new sogoWebDAV(folderData.url, aclQueryHandler,
+																{rqType: "remove-user",
+																 node: fullID});
+			post.post(postQuery);
+		}
 	}
 }
 
@@ -116,13 +122,23 @@ function onLoad() {
 	folderData.rolesDialogURL = data.rolesDialogURL;
 
 	showThrobber(true);
-	var reportQuery = ('<acl-query'
-										 + ' xmlns="urn:inverse:params:xml:ns:inverse-dav">'
-										 + '<user-list/>'
-										 + '</acl-query>');
-	var report = new sogoWebDAV(folderData.url, aclQueryHandler,
-															{ rqType: "user-list" });
-	report.report(reportQuery, false);
+
+	var handler = {
+	onDAVQueryComplete: function(status, response, headers, data) {
+			folderData.hasPublicAccess = (status > 199 && status < 300);
+			var reportQuery = ('<acl-query'
+												 + ' xmlns="urn:inverse:params:xml:ns:inverse-dav">'
+												 + '<user-list/>'
+												 + '</acl-query>');
+			var report = new sogoWebDAV(folderData.url,
+																	aclQueryHandler, { rqType: "user-list" });
+			report.report(reportQuery, false);
+		}
+	};
+
+	var options = new sogoWebDAV(sogoBaseURL() + "../public/",
+															 handler);
+	options.options();
 }
 
 function _parseResultNode(node) {
@@ -173,7 +189,27 @@ function _appendUserInList(user, userClass) {
 	var userItem = _createUserListItem(user);
 	userItem.className += " " + userClass;
 	var list = document.getElementById("userList");
-	list.appendChild(userItem);
+	var lis = list.getElementsByTagName("listitem");
+	var count = lis.length - 1;
+	if (userClass == "normal-user" && lis.length > 0
+			&& lis[count].className.indexOf("normal-user") == -1) {
+		var nextLi = null;
+		while (count > -1 && !nextLi) {
+			if (lis[count].className.indexOf("normal-user") > -1) {
+				nextLi = lis[count+1];
+			}
+			else {
+				count--;
+			}
+		}
+		if (!nextLi) {
+			nextLi = lis[0];
+		}
+		list.insertBefore(userItem, nextLi);
+	}
+	else {
+		list.appendChild(userItem);
+	}
 
 	return true;
 }
