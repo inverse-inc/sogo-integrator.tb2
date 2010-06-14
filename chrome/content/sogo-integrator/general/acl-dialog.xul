@@ -35,20 +35,18 @@
     <command id="AclCommandDelete" oncommand="deleteEntry();"/>
   </commandset>
 
-  <vbox id="dialogContent">
-    <hbox id="entriesToolbar">
-      <toolbarbutton id="addUserBtn" tooltiptext="&acl.addUser.label;"
-	command="AclCommandAdd"/>
-      <toolbarbutton id="removeUserBtn" tooltiptext="&acl.removeUser.label;"
-	command="AclCommandDelete"/>
-      <toolbarspring/>
-      <toolbaritem>
-	<button mode="dialog"
-	  class="acl-toolbar-button"
-	  id="throbber"/>
-      </toolbaritem>
-    </hbox>
-    <listbox flex="true" id="userList" seltype="single">
-    </listbox>
-  </vbox>
+  <hbox id="entriesToolbar">
+    <toolbarbutton id="addUserBtn" tooltiptext="&acl.addUser.label;"
+                   command="AclCommandAdd"/>
+    <toolbarbutton id="removeUserBtn" tooltiptext="&acl.removeUser.label;"
+                   command="AclCommandDelete"/>
+    <toolbarspring/>
+    <toolbaritem>
+      <button mode="dialog"
+              class="acl-toolbar-button"
+              id="throbber"/>
+    </toolbaritem>
+  </hbox>
+  <listbox flex="true" id="userList" seltype="single">
+  </listbox>
 </dialog>
