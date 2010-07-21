@@ -24,59 +24,29 @@
   type="dialog"
   buttons="none"
   title="&acl-dialog.title;">
+  <stringbundle id="acl-dialog-strings"
+    src="chrome://sogo-integrator/locale/general/acl-dialog.properties"/>
+
   <script type="application/x-javascript"
     src="chrome://sogo-integrator/content/general/acl-dialog.js"/>
 
   <commandset id="aclCommands">
-    <command id="AclCommandClose" oncommand="window.close()"/>
-    <command id="AclCommandEdit" oncommand="editSelectedEntry();"/>
-    <command id="AclCommandEditDefault" oncommand="editDefaultEntry();"/>
     <command id="AclCommandAdd" oncommand="addEntry();"/>
     <command id="AclCommandDelete" oncommand="deleteEntry();"/>
   </commandset>
 
-  <toolbox id="acl-toolbox" class="toolbox-top" mode="full" visible="true">
-    <toolbar id="acl-toolbar" class="toolbar-primary chromeclass-toolbar"
-      fullscreentoolbar="true" mode="full"
-      defaultset="button-close,separator,button-edit" collapsed="false"
-      customizable="false">
-      <toolbaritem>
-	<toolbarbutton
-	  mode="dialog"
-	  class="acl-toolbar-button"
-	  id="acl-close-button"
-	  label="&acl.toolbar.close.label;"
-	  command="AclCommandClose"
-	  disable-on-readonly="true"/>
-	<separator orient="vertical" class="groove"/>
-	<toolbarbutton
-	  mode="dialog"
-	  class="acl-toolbar-button"
-	  id="acl-edit-button"
-	  label="&acl.toolbar.edit.label;"
-	  command="AclCommandEdit"
-	  disable-on-readonly="true"/>
-      </toolbaritem>
-      <toolbarspring/>
-      <toolbaritem>
-	<button mode="dialog"
-	  class="acl-toolbar-button"
-	  id="throbber"/>
-      </toolbaritem>
-    </toolbar>
-  </toolbox>
-
-  <vbox id="dialogContent">
-    <hbox id="entriesToolbar">
-      <toolbarbutton id="addUserBtn" tooltiptext="&acl.addUser.label;"
-	command="AclCommandAdd"/>
-      <toolbarbutton id="removeUserBtn" tooltiptext="&acl.removeUser.label;"
-	command="AclCommandDelete"/>
-      <spacer flex="1"/>
-      <button collapsed="true" id="defaultRolesBtn"
-	label="&acl.defaultRoles.label;" command="AclCommandEditDefault"/>
-    </hbox>
-    <listbox flex="true" id="userList" seltype="single">
-    </listbox>
-  </vbox>
+  <hbox id="entriesToolbar">
+    <toolbarbutton id="addUserBtn" tooltiptext="&acl.addUser.label;"
+                   command="AclCommandAdd"/>
+    <toolbarbutton id="removeUserBtn" tooltiptext="&acl.removeUser.label;"
+                   command="AclCommandDelete"/>
+    <toolbarspring/>
+    <toolbaritem>
+      <button mode="dialog"
+              class="acl-toolbar-button"
+              id="throbber"/>
+    </toolbaritem>
+  </hbox>
+  <listbox flex="true" id="userList" seltype="single">
+  </listbox>
 </dialog>

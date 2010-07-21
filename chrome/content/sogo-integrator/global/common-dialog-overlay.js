@@ -62,19 +62,27 @@ function _SIGetDialogType() {
 	var description = box.getElementsByTagName('description')[0];
 	var text = description.textContent + "";
 
-	var mailserver
-		= Components.classes["@mozilla.org/messenger/account-manager;1"]
-		.getService(Components.interfaces.nsIMsgAccountManager)
-		.defaultAccount.incomingServer;
-	var mailUserLogin = mailserver.realUsername + "@" + mailserver.realHostName;
 	var serverBaseURLParts = sogoBaseURL().split("/");
 	var serverBaseURL = serverBaseURLParts[0] + "//" + serverBaseURLParts[2];
+	var mailserver = Components.classes["@mozilla.org/messenger/account-manager;1"]
+														 .getService(Components.interfaces.nsIMsgAccountManager)
+														 .defaultAccount.incomingServer;
+	var mailUserLogin = mailserver.realUsername + "@" + mailserver.realHostName;
+	var smtpServer = Components.classes["@mozilla.org/messengercompose/smtp;1"]
+								             .getService(Components.interfaces.nsISmtpService)
+														 .defaultServer.hostname;
 
 	var dialogType;
-	if (text.indexOf("SOGo") > -1 && text.indexOf(serverBaseURL) > -1)
+	if (text.indexOf("SOGo") > -1 && text.indexOf(serverBaseURL) > -1) {
 		dialogType = "sogo";
-	else if (text.indexOf(mailUserLogin) > -1)
+	}
+	else if (text.indexOf(mailUserLogin) > -1) {
 		dialogType = "mail";
+	}
+	else if (text.indexOf(mailserver.realUsername) > -1
+					 && text.indexOf(smtpServer) > -1) {
+		dialogType = "smtp";
+	}
 	else {
 		dialogType = "none";
 		/* pop3 dialogs */
@@ -114,7 +122,7 @@ function SICommonDialogOnLoad() {
 		var password;
 		if (context.password) {
 			password = context.password;
-			checkbox.checked = context.checked;
+			checkbox.checked = (context.checked != false);
 			gCommonDialogParam.SetInt(1, context.checked);
 		}
 		else
@@ -130,14 +138,18 @@ function SICommonDialogOnLoad() {
 		if (!context.tries)
 			context.tries = {};
 		var tries = 1;
-		if (context.tries[dialogType])
-			tries += context.tries[dialogType];
+		if (context.tries[dialogType]) {
+			tries = context.tries[dialogType] + 1;
+		}
+
 		var dialog = document.getElementById("commonDialog");
-		if (password == "" || tries > 1) {
+		if (password == "" || tries > 2) {
 			window.SIOldCommonDialogOnAccept = window.commonDialogOnAccept;
 			window.commonDialogOnAccept = window.SICommonDialogOnAccept;
 			passwordField.focus();
 			passwordField.value = "";
+
+			context.tries[dialogType] = 0;
 
 			dialog.addEventListener("dialogcancel", SIOnDialogCancel, false);
 			passwordObserver = new SIPasswordObserver(dialog, passwordField,

@@ -2,20 +2,7 @@
 { width: 400px;
   height: 200px;
   padding: 0px;
-  margin: 0px; }
-
-.acl-toolbar-button
-{ -moz-box-orient: vertical;
-  height: 42px;
-  min-width: 0px; }
-
-#acl-close-button
-{ -moz-image-region: rect(0px 24px 24px 0px);
-  list-style-image: url("chrome://sogo-integrator/skin/close-window.png"); }
-
-#acl-edit-button
-{ -moz-image-region: rect(0px 24px 24px 0px);
-  list-style-image: url("chrome://sogo-integrator/skin/edit-rights.png"); }
+  margin: 5px; }
 
 #throbber
 { width: 24px;
@@ -32,9 +19,6 @@
 #acl-toolbox separator
 { width: 2px; }
 
-#dialogContent
-{ margin: 5px; }
-
 #addUserBtn
 { overflow: visible;
   -moz-appearance: button;
@@ -50,4 +34,15 @@
   list-style-image: url("chrome://sogo-integrator/skin/remove-contact.gif"); }
 
 #entriesToolbar
-{ height: 36px; }
+{ height: 36px;
+  margin-left: 5px; }
+
+.normal-user
+{ list-style-image: url("chrome://messenger/skin/addressbook/icons/abcard.png"); }
+
+.any-user
+{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anyone.png");
+  border-top: 1px dotted #555; }
+
+.anonymous-user
+{ list-style-image: url("chrome://sogo-integrator/skin/abcard-anonymous.png"); }

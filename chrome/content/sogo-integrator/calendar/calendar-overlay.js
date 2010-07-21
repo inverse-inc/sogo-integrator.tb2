@@ -160,22 +160,45 @@ function toggleShowOnlyCalendarByCal(cal) {
 		if (calendar.uri != cal.uri) {
 			composite.removeCalendar(calendar.uri);
 		}
-
-		calendarListTreeView.treebox.invalidateRow(i);
 	}
 
 	composite.addCalendar(cal);
-}
-
-calendarListTreeView.onClick = function cLTV_onClick(event) {
-	if (event.button == 0) {
-		var col = {};
-		var calendar = this.getCalendarFromEvent(event, col);
-		if (col.value && col.value.id == "calendar-list-tree-checkbox"
-				&& event.shiftKey) {
-			toggleShowOnlyCalendarByCal(calendar);
-		}
+	for (var i = 0; i < calendarListTreeView.rowCount; i++) {
+		calendarListTreeView.treebox.invalidateRow(i);
 	}
 }
 
+var methods = [ "setCellValue", "cycleCell", "onMouseDown" ];
+for (var i = 0; i < methods.length; i++) {
+	var methodName = methods[i];
+	var oldMethodName = "_old" + methodName;
+	(function (o, n) {
+		calendarListTreeView[o] = calendarListTreeView[n];
+		calendarListTreeView[n] = function() {
+			// dump("invoking " + n + "\n" + STACK(50));
+			var rc = calendarListTreeView[o].apply(calendarListTreeView, arguments);
+			// dump("  invoked " + n + "\n");
+			return rc;
+		}
+	})(oldMethodName, methodName);
+}
+
 window.creationGetHandler = subscriptionGetHandler;
+
+window.addEventListener("load", SIOnCalendarOverlayLoad, false);
+
+function SIOnCalendarOverlayLoad() {
+	var widget = document.getElementById("calendar-list-tree-widget");
+	widget.addEventListener("mousedown", SIOnListMouseDown, true);
+}
+
+function SIOnListMouseDown(event) {
+	if (event.type == "mousedown" && event.button == 0 && event.shiftKey) {
+		var col = {};
+		var calendar = calendarListTreeView.getCalendarFromEvent(event, col);
+		if (calendar && col.value && col.value.id == "calendar-list-tree-checkbox") {
+			toggleShowOnlyCalendarByCal(calendar);
+			event.stopPropagation();
+		}
+	}
+}
