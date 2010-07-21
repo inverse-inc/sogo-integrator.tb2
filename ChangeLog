@@ -1,3 +1,14 @@
+2010-06-14  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
+
+	* chrome/content/sogo-integrator/global/common-dialog-overlay.js
+	(_SIGetDialogType): added support for the "smtp" type.
+	(SICommonDialogOnLoad): we reset the "tries" counter to 0 when the
+	dialog has been popped up. We also only pop it up after 2 tries
+	rather than only 1, since two SOGo dialog might popup at the same
+	time.
+	Finally, the checkbox status must be explicitly set to a boolean
+	value.
+
 2010-06-07  Wolfgang Sourdeau  <wsourdeau@inverse.ca>
 
 	* chrome/content/sogo-integrator/general/acl-dialog.js
