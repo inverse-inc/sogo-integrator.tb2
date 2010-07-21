@@ -182,8 +182,6 @@ for (var i = 0; i < methods.length; i++) {
 		}
 	})(oldMethodName, methodName);
 }
-####### Ancestor
-======= end
 
 window.creationGetHandler = subscriptionGetHandler;
 
